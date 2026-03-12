@@ -48,6 +48,11 @@ class BuddyRecommendation(models.Model):
             models.UniqueConstraint(
                 fields=['from_user', 'to_user'],
                 name='unique_buddy_recommendation'
+            ),
+            models.CheckConstraint(
+                condition=~models.Q(from_user=models.F('to_user')),
+                name='buddy_recommendation_no_self_recommendations',
+                violation_error_message='A user cannot be recommended themselves as a buddy'
             )
         ]
 
