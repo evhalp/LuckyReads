@@ -1,7 +1,7 @@
 map $ENV $media_target {
   default    "http://app_upstream/files/media";
   DEV        "http://app_upstream/files/media";
-  PROD       "https://$S3_STORAGE_BUCKET_NAME.s3.amazonaws.com";
+  PROD       "http://app_upstream/files/media";
 }
 
 map $ENV $proxy_host {
@@ -68,6 +68,7 @@ server {
     
     proxy_set_header           Host "$proxy_host";
     proxy_set_header           X-Forwarded-For "$proxy_add_x_forwarded_for";
+    proxy_set_header           X-Forwarded-Proto $scheme;
     proxy_pass_header          Token;
     
     client_max_body_size       32M;

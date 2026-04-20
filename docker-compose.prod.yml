@@ -1,0 +1,161 @@
+services:
+  app:
+    image: jhooth0904/luckyreads-app:latest
+    container_name: luckyreads-app
+    volumes:
+      - static-luckyreads:/vol/web
+    user: "1000:1000"
+    restart: always
+    env_file:
+      - .env
+    command: >
+      sh -c "
+      python manage.py wait_for_db &&
+      python manage.py migrate &&
+      python manage.py collectstatic --no-input &&
+      python manage.py init_superuser &&
+      python -m uvicorn luckyreads.asgi:application --host 0.0.0.0 --port 9000 --lifespan off --workers ${WORKER_COUNT:-4}"
+    environment:
+      - PORT=9000
+      - CELERY_BROKER_URL=redis://luckyreads-redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://luckyreads-redis:6379/0
+      - DJANGO_REDIS_URL=redis://luckyreads-redis:6379/1
+      - POSTGRES_HOST=luckyreads-postgres
+      - DJANGO_SETTINGS_MODULE=luckyreads.settings.production
+      - DJANGO_BASE_URL=${DJANGO_BASE_URL}
+      - WORKER_COUNT=${WORKER_COUNT:-4}
+      - REDIS_HOST=luckyreads-redis
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - cluster
+    healthcheck:
+      test: ["CMD-SHELL", "/scripts/healthcheck.sh"]
+      interval: 60s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  postgres:
+    image: postgres:15-alpine
+    command: -c 'max_connections=200'
+    container_name: luckyreads-postgres
+    restart: always
+    volumes:
+      - postgres-luckyreads:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_NAME=${POSTGRES_NAME}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - cluster
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  redis:
+    image: redis:alpine
+    container_name: luckyreads-redis
+    restart: always
+    volumes:
+      - redis-luckyreads:/data
+    networks:
+      - cluster
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+
+  celery:
+    image: yourusername/luckyreads-app:latest
+    container_name: luckyreads-celery
+    restart: always
+    user: django-user
+    command: ["celery", "-A", "luckyreads", "worker", "--loglevel=info", "--concurrency=4"]
+    volumes:
+      - static-luckyreads:/vol/web
+    depends_on:
+      - redis
+      - postgres
+      - app
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=redis://luckyreads-redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://luckyreads-redis:6379/0
+      - DJANGO_REDIS_URL=redis://luckyreads-redis:6379/1
+      - POSTGRES_HOST=luckyreads-postgres
+      - DJANGO_SETTINGS_MODULE=luckyreads.settings.production
+    networks:
+      - cluster
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  celerybeat:
+    image: yourusername/luckyreads-app:latest
+    container_name: luckyreads-celerybeat
+    restart: always
+    user: django-user
+    command:
+      [
+        "celery", "-A", "luckyreads", "beat",
+        "--loglevel=info",
+        "--scheduler", "django_celery_beat.schedulers:DatabaseScheduler",
+      ]
+    volumes:
+      - static-luckyreads:/vol/web
+    depends_on:
+      - redis
+      - postgres
+      - celery
+      - app
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=redis://luckyreads-redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://luckyreads-redis:6379/0
+      - DJANGO_REDIS_URL=redis://luckyreads-redis:6379/1
+      - POSTGRES_HOST=luckyreads-postgres
+      - DJANGO_SETTINGS_MODULE=luckyreads.settings.production
+    networks:
+      - cluster
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+
+  proxy:
+    image: yourusername/luckyreads-proxy:latest
+    container_name: luckyreads-proxy
+    restart: always
+    ports:
+      - 80:8080
+      - 443:8081
+    networks:
+      - cluster
+    depends_on:
+      - app
+    volumes:
+      - static-luckyreads:/vol/web
+    environment:
+      - SERVER_URI=luckyreads-app:9000
+      - SERVER_REPLICA_URI=luckyreads-app:9000
+      - ENV=PROD
+      - DELAY=10s
+
+volumes:
+  postgres-luckyreads:
+  redis-luckyreads:
+  static-luckyreads:
+
+networks:
+  cluster:
+    name: luckyreads_cluster
