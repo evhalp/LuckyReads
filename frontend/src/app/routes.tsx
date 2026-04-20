@@ -11,6 +11,7 @@ import MyShelf from "./pages/MyShelf";
 import Home from "./pages/Home";
 import FindReaders from "./pages/FindReaders";
 import Profile from "./pages/Profile";
+import ReaderProfile from "./pages/ReaderProfile";
 import { isAuthenticated } from "./session";
 
 function AuthRedirect() {
@@ -76,6 +77,12 @@ export const routes: RouteObject[] = [
         path: "/find-readers",
         element: createElement(ProtectedRoute, {
             children: createElement(FindReaders),
+        }),
+    },
+    {
+        path: "/readers/:id",
+        element: createElement(ProtectedRoute, {
+            children: createElement(ReaderProfile),
         }),
     },
     {

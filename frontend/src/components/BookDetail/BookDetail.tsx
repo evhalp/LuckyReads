@@ -111,7 +111,7 @@ export default function BookDetail({
                             {book.rating && (
                                 <div className="book-detail-rating">
                                     <span className="rating-value">
-                                        {book.rating}
+                                        {book.rating.toFixed(1)}
                                     </span>
                                     <span className="rating-stars">★★★★☆</span>
                                 </div>

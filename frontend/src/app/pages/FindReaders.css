@@ -140,6 +140,13 @@
     font-size: 2rem;
     font-weight: 700;
     flex-shrink: 0;
+    overflow: hidden;
+}
+
+.reader-card__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .reader-card__name {
@@ -154,6 +161,13 @@
     margin: 0;
     color: #666;
     font-size: 0.875rem;
+}
+
+.reader-card__bio {
+    margin: 0;
+    color: #5a5a5a;
+    font-size: 0.9rem;
+    line-height: 1.5;
 }
 
 .reader-card__genres {
@@ -194,6 +208,25 @@
 
 .reader-card__follow-btn:active {
     transform: scale(0.98);
+}
+
+.find-readers-profile-preview {
+    margin-top: 2rem;
+    background: #fff;
+    border: 1px solid #e0d9d3;
+    border-radius: 12px;
+    padding: 1.25rem;
+}
+
+.find-readers-profile-preview h3 {
+    margin: 0 0 0.5rem 0;
+    color: #2f3726;
+}
+
+.find-readers-profile-preview p {
+    margin: 0;
+    color: #5a5a5a;
+    line-height: 1.5;
 }
 
 @media (max-width: 768px) {

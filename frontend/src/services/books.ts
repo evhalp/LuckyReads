@@ -10,6 +10,16 @@ type ApiBook = {
     title?: string | null;
     authors?: ApiAuthor[] | null;
     cover_url?: string | null;
+    isbn?: string | null;
+    average_rating?: number | null;
+    reviews?: ApiBookReview[] | null;
+};
+
+type ApiBookReview = {
+    id?: number | string;
+    author?: string | null;
+    rating?: number | null;
+    text?: string | null;
 };
 
 type ApiRecommendation = {
