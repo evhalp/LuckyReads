@@ -2,13 +2,13 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 
 from apps.core.abstracts.serializers import ModelSerializer, ModelSerializerBase
-from apps.users.models import User
+from apps.users.models import User, BuddyRelationship
 
 class UserSerializer(ModelSerializer):
 
   email = serializers.EmailField()
   username = serializers.CharField(required=False)
-  bio = serializers.CharField(required=False)
+  bio = serializers.CharField(required=False, allow_blank=True)
 
   class Meta:
     model = User
@@ -18,6 +18,21 @@ class UserSerializer(ModelSerializer):
       "email",
       "bio",
     ]
+
+  def validate(self, attrs: dict) -> dict:
+    username = attrs.get("username")
+
+    if username is not None:
+      queryset = User.objects.filter(username=username)
+      if self.instance is not None:
+        queryset = queryset.exclude(id=self.instance.id)
+
+      if queryset.exists():
+        raise serializers.ValidationError(
+          {"username": "A user with this username already exists."}
+        )
+
+    return attrs
 
   def create(self, validated_data: dict) -> User:
     """Create and return a user with encrypted password"""
@@ -71,3 +86,11 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('User account is disabled.')
         data['user'] = user
         return data
+
+class BuddyRelationshipSerializer(ModelSerializer):
+   buddy = PublicUserSerializer(read_only=True)
+
+   class Meta:
+      model = BuddyRelationship
+      fields = [*ModelSerializerBase.default_fields, 'buddy']
+      read_only_fields = ['buddy']

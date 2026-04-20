@@ -1,46 +1,69 @@
-.my-shelf {
-    min-height: 100vh;
-}
-
 .my-shelf-container {
-    width: min(1200px, 90%);
-    margin: 40px auto;
+    width: min(1280px, calc(100% - 3rem));
+    margin: 0 auto;
+    padding: 3.5rem 0 4.5rem;
 }
 
-.profile-name {
-    margin: 0 0 32px 0;
-    font-size: 32px;
-    font-weight: bold;
+.my-shelf-title {
+    margin: 0 0 2rem;
     color: #3f4a34;
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 4vw, 3rem);
+    line-height: 1;
+    font-weight: 500;
+}
+
+.shelf-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
 }
 
 .shelf-tabs {
-    border: 1px solid #ddd8c9;
-    padding: 4px;
-    border-radius: 18px;
-    margin: 0 0 32px 0;
-    width: fit-content;
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    padding: 0.3rem;
+    border: 1px solid rgba(107, 123, 90, 0.16);
+    border-radius: 999px;
+    background: #f8f4eb;
 }
 
 .shelf-tab {
-    background-color: transparent;
-    padding: 10px 20px;
-    margin: 0 2px;
+    padding: 0.7rem 1.1rem;
     border: none;
-    font-weight: 600;
+    border-radius: 999px;
+    background: transparent;
     color: #6b7b5a;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
 }
 
 .shelf-tab.active {
-    border: 1px solid #ddd8c9;
-    border-radius: 14px;
-    border-color: #ddd8c9;
-    background-color: #3f4a34;
-    color: #c6b593;
+    background: #3f4a34;
+    color: #f3edde;
+}
+
+.add-book-button {
+    height: 2.7rem;
+    padding: 0 1.15rem;
+    margin: 0;
+    border: none;
+    border-radius: 999px;
+    background: #3f4a34;
+    color: #efe8dc;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
 }
 
 .book-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
+    gap: 1.5rem;
+    align-items: stretch;
+    justify-content: start;
 }

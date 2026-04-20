@@ -1,5 +1,12 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getApiErrorMessage } from "../../api/client";
+import { loginUser } from "../../api/auth";
+import { storeSession } from "../session";
+import AuthField from "../../components/auth/AuthField";
+import AuthShell from "../../components/auth/AuthShell";
+
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Login() {
   const navigate = useNavigate();
@@ -8,7 +15,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!email.trim() || !password.trim()) {
@@ -16,80 +23,87 @@ export default function Login() {
       return;
     }
 
+    if (!emailPattern.test(email.trim())) {
+      setError("Enter a valid email address.");
+      return;
+    }
+
     setError("");
     setIsSubmitting(true);
 
-    window.setTimeout(() => {
+    try {
+      const response = await loginUser(email.trim(), password);
+
+      storeSession(response.token, response.user);
+
       navigate("/home", {
-        state: { email },
+        state: {
+          email: response.user.email,
+          profileName: response.user.username,
+        },
       });
-    }, 450);
+    } catch (caughtError) {
+      setError(getApiErrorMessage(caughtError) || "We couldn't sign you in. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <main className="login-shell">
-      <section className="login-panel">
-        <div className="login-copy">
-          <p className="login-eyebrow">LuckyReads</p>
-          <h1 className="login-title">Welcome Back</h1>
-          <p className="login-subtitle">
-            Sign in to continue your reading journey
-          </p>
-        </div>
+    <AuthShell
+      title="Welcome Back"
+      subtitle="Sign in to continue your reading journey"
+    >
+      <form className="login-form" onSubmit={handleSubmit}>
+        <AuthField label="Email">
+          <input
+            type="email"
+            name="email"
+            placeholder="your@email.com"
+            autoComplete="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+        </AuthField>
 
-        <form className="login-form" onSubmit={handleSubmit}>
-          <label className="login-field">
-            <span>Email</span>
-            <input
-              type="email"
-              name="email"
-              placeholder="your@email.com"
-              autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-            />
-          </label>
+        <AuthField label="Password">
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+        </AuthField>
 
-          <label className="login-field">
-            <span>Password</span>
-            <input
-              type="password"
-              name="password"
-              placeholder="Enter your password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-          </label>
-
-          <div className="login-meta">
-            <Link className="login-link" to="/forgot-password">
-              Forgot password?
-            </Link>
-          </div>
-
-          {error ? (
-            <p className="login-message login-message-error">{error}</p>
-          ) : null}
-
-          <button className="login-submit" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Signing In..." : "Sign In"}
-          </button>
-        </form>
-
-        <div className="login-divider" aria-hidden="true">
-          <span />
-          <p>or</p>
-          <span />
-        </div>
-
-        <p className="login-footer">
-          Don&apos;t have an account yet?{" "}
-          <Link className="login-footer-link" to="/onboarding">
-            Create Reader Profile
+        <div className="login-meta">
+          <Link className="login-link" to="/forgot-password">
+            Forgot password?
           </Link>
-        </p>
-      </section>
-    </main>
+        </div>
+
+        {error ? (
+          <p className="login-message login-message-error">{error}</p>
+        ) : null}
+
+        <button className="login-submit" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Signing In..." : "Sign In"}
+        </button>
+      </form>
+
+      <div className="login-divider" aria-hidden="true">
+        <span />
+        <p>or</p>
+        <span />
+      </div>
+
+      <p className="login-footer">
+        Don&apos;t have an account yet?{" "}
+        <Link className="login-footer-link" to="/signup">
+          Create Reader Profile
+        </Link>
+      </p>
+    </AuthShell>
   );
 }

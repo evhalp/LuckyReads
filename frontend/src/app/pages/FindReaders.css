@@ -1,0 +1,320 @@
+.find-readers-page {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at top, rgba(248, 244, 235, 0.7), transparent 30%),
+    #efe8dc;
+  color: #2f3726;
+  font-family: var(--font-body);
+}
+
+.find-readers-shell {
+  width: min(1180px, calc(100% - 3rem));
+  margin: 0 auto;
+}
+
+.find-readers-hero {
+  background:
+    radial-gradient(circle at top, rgba(255, 248, 236, 0.1), transparent 34%),
+    linear-gradient(180deg, #46543a 0%, #3f4a34 100%);
+}
+
+.find-readers-hero__content {
+  padding: 4.5rem 1.5rem 3.5rem;
+  text-align: center;
+}
+
+.find-readers-hero__title {
+  margin: 0;
+  color: #f8f4eb;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.find-readers-hero__subtitle {
+  width: min(640px, 100%);
+  margin: 1rem auto 0;
+  color: #d8d2c7;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+.find-readers-main {
+  padding: 3.25rem 0 4rem;
+}
+
+.find-readers-search-section {
+  width: min(100%, 620px);
+  margin: 1.5rem auto 0;
+  padding: 0;
+}
+
+.find-readers-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: #f3edde;
+  border: 1px solid rgba(198, 181, 147, 0.45);
+  border-radius: 999px;
+  box-shadow: 0 10px 28px rgba(26, 33, 22, 0.12);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.find-readers-search-box:focus-within {
+  border-color: #6b7b5a;
+  box-shadow:
+    0 0 0 4px rgba(107, 123, 90, 0.2),
+    0 10px 30px rgba(26, 33, 22, 0.14);
+  transform: translateY(-1px);
+}
+
+.find-readers-search__icon {
+  width: 20px;
+  height: 20px;
+  margin-left: 1.15rem;
+  color: #5a644d;
+  flex-shrink: 0;
+}
+
+.find-readers-search__input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  height: 3.5rem;
+  padding: 0 1.5rem 0 0.85rem;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 400;
+  color: #2f3726;
+  outline: none;
+  line-height: 1.65;
+}
+
+.find-readers-search__input::placeholder {
+  color: #6f725e;
+}
+
+.find-readers-results {
+  padding: 3rem 1.5rem 0;
+}
+
+.find-readers-results__header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.find-readers-results__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.find-readers-results__subtitle {
+  margin: 0.45rem 0 0;
+  color: #66705d;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+.find-readers-results__count {
+  margin: 0;
+  color: #46543a;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.find-readers-state {
+  padding: 2.5rem 1.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(70, 84, 58, 0.12);
+  border-radius: 20px;
+  text-align: center;
+  color: #44503b;
+}
+
+.find-readers-state p {
+  margin: 0.2rem 0;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+.find-readers-state--error {
+  margin-bottom: 1.5rem;
+  background: #fff4ef;
+  border-color: rgba(158, 78, 53, 0.18);
+  color: #8f3b22;
+}
+
+.readers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.reader-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(70, 84, 58, 0.12);
+  border-radius: 24px;
+  box-shadow: 0 18px 34px rgba(49, 59, 40, 0.08);
+}
+
+.reader-card__avatar {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #46543a 0%, #6d7b60 100%);
+  color: #f8f4eb;
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.reader-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.reader-card__eyebrow {
+  margin: 0;
+  color: #738066;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.reader-card__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 3vw, 1.8rem);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.reader-card__status {
+  margin: 0;
+  color: #46543a;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.reader-card__bio {
+  margin: 0;
+  color: #5a6452;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+.reader-card__action {
+  border: none;
+  border-radius: 999px;
+  padding: 0.9rem 1.1rem;
+  background: #46543a;
+  color: #f8f4eb;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.reader-card__action:hover:not(:disabled) {
+  background: #39452f;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 18px rgba(57, 69, 47, 0.18);
+}
+
+.reader-card__action:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.reader-card__action--secondary {
+  background: #e2d9ca;
+  color: #314026;
+}
+
+.reader-card__action--secondary:hover:not(:disabled) {
+  background: #d6cab7;
+}
+
+.reader-card--skeleton {
+  min-height: 280px;
+  border-color: rgba(70, 84, 58, 0.08);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.9) 25%,
+      rgba(242, 237, 227, 0.95) 50%,
+      rgba(255, 255, 255, 0.9) 75%
+    );
+  background-size: 200% 100%;
+  animation: find-readers-pulse 1.3s ease-in-out infinite;
+}
+
+@keyframes find-readers-pulse {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .find-readers-shell {
+    width: calc(100% - 1.5rem);
+  }
+
+  .find-readers-hero__content {
+    padding: 4rem 1rem 3rem;
+  }
+
+  .find-readers-search-section {
+    margin-top: 1.25rem;
+  }
+
+  .find-readers-results {
+    padding: 2.25rem 0 0;
+  }
+
+  .find-readers-results__header {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .readers-grid {
+    grid-template-columns: 1fr;
+  }
+}
