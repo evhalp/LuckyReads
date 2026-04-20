@@ -11,7 +11,13 @@ from apps.core.utils import Query, query_parameters
 from apps.core.abstracts.viewsets import ModelViewSetBase, ViewSetBase
 from apps.users.models import User
 from apps.users.permissions import IsOwnerOrReadOnly
-from apps.users.serializers import LoginSerializer, RegisterSerializer, UserSerializer, PublicUserSerializer
+from apps.users.serializers import (
+    LoginSerializer,
+    RegisterSerializer,
+    UserSerializer,
+    PublicUserSerializer,
+    ReaderListUserSerializer,
+)
 
 @extend_schema(
     request=RegisterSerializer,
@@ -60,7 +66,7 @@ class LoginView(APIView):
             }
         )
     
-class UserViewSet(mixins.RetrieveModelMixin, ViewSetBase):
+class UserViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, ViewSetBase):
     """
     GET /api/users/{id}
     GET /api/users/search/?username={username}
@@ -85,6 +91,8 @@ class UserViewSet(mixins.RetrieveModelMixin, ViewSetBase):
 
 
     def get_serializer_class(self) -> type[serializers.ModelSerializer]:
+        if self.action in ('list'):
+            return ReaderListUserSerializer
         if self.action in ('retrieve'):
             obj = self.get_object()
             if obj == self.request.user:

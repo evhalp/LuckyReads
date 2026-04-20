@@ -1,0 +1,64 @@
+.reader-profile-page {
+  min-height: 100dvh;
+  background: #efe8dc;
+  color: #2f3726;
+}
+
+.reader-profile-shell {
+  width: min(900px, calc(100% - 3rem));
+  margin: 2rem auto 4rem;
+}
+
+.reader-profile-back {
+  border: 1px solid #d4cdc5;
+  border-radius: 10px;
+  background: #fff;
+  color: #2f3726;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+}
+
+.reader-profile-card {
+  margin-top: 1rem;
+  background: #fff;
+  border: 1px solid #e0d9d3;
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+.reader-profile-header h1 {
+  margin: 0;
+}
+
+.reader-profile-header p {
+  margin: 0.4rem 0 0;
+  color: #5a5a5a;
+}
+
+.reader-profile-bio,
+.reader-profile-reviews {
+  margin-top: 1.2rem;
+}
+
+.reader-profile-reviews ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.reader-profile-review-item {
+  border: 1px solid #e9e2db;
+  border-radius: 10px;
+  padding: 0.9rem;
+}
+
+.reader-profile-review-item h3,
+.reader-profile-review-item p {
+  margin: 0.2rem 0;
+}
+
+.reader-profile-error {
+  color: #8a2f2f;
+}
