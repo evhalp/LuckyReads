@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import BookCard from "../../components/books/BookCard";
 import BookDetail, { type BookDetailData } from "../../components/BookDetail/BookDetail";
@@ -10,8 +10,9 @@ import {
     type DisplayBook,
 } from "../../services/books";
 import "./Home.css";
-
 const SKELETON_COUNT = 6;
+type HomeFilter = "All" | "Books" | "Authors";
+const FILTER_OPTIONS: HomeFilter[] = ["All", "Books", "Authors"];
 
 function SearchIcon() {
     return (
@@ -41,11 +42,13 @@ export default function Home() {
     const [loadingAllBooks, setLoadingAllBooks] = useState(false);
     const [loadingSearch, setLoadingSearch] = useState(false);
     const [error, setError] = useState("");
+    const [activeFilter, setActiveFilter] = useState<HomeFilter>("All");
     const [selectedBook, setSelectedBook] = useState<BookDetailData | null>(null);
     const [isBookDetailOpen, setIsBookDetailOpen] = useState(false);
 
     const trimmedQuery = searchQuery.trim();
     const hasSearchQuery = debouncedQuery.length > 0;
+    const searchSupported = activeFilter !== "Authors";
 
     useEffect(() => {
         let cancelled = false;
@@ -134,7 +137,7 @@ export default function Home() {
     }, [trimmedQuery]);
 
     useEffect(() => {
-        if (!debouncedQuery) {
+        if (!debouncedQuery || !searchSupported) {
             setLoadingSearch(false);
             setSearchResults([]);
             setError("");
@@ -173,22 +176,34 @@ export default function Home() {
         return () => {
             cancelled = true;
         };
-    }, [debouncedQuery]);
+    }, [debouncedQuery, searchSupported]);
 
     const heading = hasSearchQuery
-        ? "Search Results"
+        ? activeFilter === "Authors"
+            ? "Author Search"
+            : "Search Results"
         : activeFilter === "Books"
         ? "All Books"
+        : activeFilter === "Authors"
+        ? "Featured Authors"
         : "Recommended For You";
     const cards = hasSearchQuery
-        ? searchResults
+        ? searchSupported
+            ? searchResults
+            : []
         : activeFilter === "Books"
         ? allBooks
+        : activeFilter === "Authors"
+        ? []
         : recommendations;
     const isLoading = hasSearchQuery
-        ? loadingSearch
+        ? searchSupported
+            ? loadingSearch
+            : false
         : activeFilter === "Books"
         ? loadingAllBooks
+        : activeFilter === "Authors"
+        ? false
         : loadingRecommendations;
     const showInlineWarning = Boolean(error) && cards.length > 0;
 
@@ -261,6 +276,25 @@ export default function Home() {
                                 placeholder="Search for books or authors..."
                             />
                         </label>
+
+                        <div className="home-filters" role="tablist" aria-label="Browse filters">
+                            {FILTER_OPTIONS.map((filter) => (
+                                <button
+                                    key={filter}
+                                    type="button"
+                                    role="tab"
+                                    aria-selected={activeFilter === filter}
+                                    className={
+                                        activeFilter === filter
+                                            ? "home-filter home-filter--active"
+                                            : "home-filter"
+                                    }
+                                    onClick={() => setActiveFilter(filter)}
+                                >
+                                    {filter}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
@@ -275,6 +309,10 @@ export default function Home() {
                                 <p className="home-results__subtitle">
                                     Showing results for "{debouncedQuery}"
                                 </p>
+                            ) : null}
+
+                            {helperMessage ? (
+                                <p className="home-results__meta">{helperMessage}</p>
                             ) : null}
                         </div>
 

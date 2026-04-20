@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model, authenticate
 
 from apps.core.abstracts.serializers import ModelSerializer, ModelSerializerBase
 from apps.books.models import Review
-from apps.users.models import User
+from apps.users.models import User, BuddyRelationship
 
 class UserSerializer(ModelSerializer):
 
