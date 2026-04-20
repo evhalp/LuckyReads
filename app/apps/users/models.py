@@ -127,3 +127,37 @@ class User(AbstractBaseUser, PermissionsMixin, UniqueModel):
 
       return super().clean()
     
+class BuddyRelationship(UniqueModel):
+    """
+    Represents a one-way buddy relationship between two users.
+    The user field is the user who added the buddy.
+    The buddy field is the user who was added.
+    """
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="buddies"
+    )
+    buddy = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="buddy_of"
+    )
+
+    class Meta:
+        db_table = "users_buddies"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "buddy"],
+                name="unique_buddies"
+            ),
+            models.CheckConstraint(
+                condition=~models.Q(user=models.F("buddy")),
+                name="no_self_buddy",
+                violation_error_message="A user cannot add themselves as a buddy"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} -> {self.buddy.username}"

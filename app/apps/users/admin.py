@@ -1,24 +1,19 @@
 from django.contrib import admin
 
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-
 from apps.core.admin import ModelAdminBase
-
-from .models import User
-
+from .models import BuddyRelationship, User
 
 
-class UserAdmin(BaseUserAdmin, ModelAdminBase):
-  """Manager users in admin dashboard."""
-
-  list_display = ("username", "email", "name", "is_staff", "bio")
+class UserAdmin(ModelAdminBase):
+  list_display = ("username", "email", "is_staff", "is_active")
   search_fields = ("username", "email")
-
-  readonly_fields = (
-    *BaseUserAdmin.readonly_fields,
-  )
+  readonly_fields = ("date_joined", "date_modified")
 
 
+class BuddyRelationshipAdmin(ModelAdminBase):
+  list_display = ("user", "buddy")
+  search_fields = ("user__username", "buddy__username")
 
 
 admin.site.register(User, UserAdmin)
+admin.site.register(BuddyRelationship, BuddyRelationshipAdmin)

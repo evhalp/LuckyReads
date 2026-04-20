@@ -1,9 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400&display=swap");
 
 /* Global baseline only; Tailwind can replace this layer when adopted. */
 :root {
     --font-body: "DM Sans", "Avenir Next", "Segoe UI", sans-serif;
     --font-display: "Cormorant Garamond", Georgia, serif;
+    --font-mono: "DM Mono", "SFMono-Regular", Consolas, monospace;
     --color-page: #efe8dc;
     --color-ink: #333333;
     --color-heading: #333333;
@@ -78,6 +79,14 @@ a {
 
 .login-copy {
     margin-bottom: 1.75rem;
+    text-align: center;
+}
+
+.login-brandmark {
+    display: block;
+    width: min(100%, 26rem);
+    height: auto;
+    margin: 0 auto 1rem;
 }
 
 .login-eyebrow {
@@ -297,26 +306,4 @@ a {
     .onboarding-secondary {
         width: 100%;
     }
-}
-
-.api-health-banner {
-    padding: 0.5rem 1rem;
-    font-size: 0.8125rem;
-    text-align: center;
-    border-bottom: 1px solid rgba(29, 36, 51, 0.12);
-}
-
-.api-health-banner-loading {
-    background: rgba(255, 255, 255, 0.65);
-    color: #3d4a63;
-}
-
-.api-health-banner-ok {
-    background: rgba(209, 250, 229, 0.85);
-    color: #065f46;
-}
-
-.api-health-banner-error {
-    background: rgba(254, 226, 226, 0.95);
-    color: #991b1b;
 }

@@ -47,36 +47,54 @@ class ShelfViewSet(CreateModelMixin, ListModelMixin, DestroyModelMixin, UpdateMo
       return ShelfEntry.objects.filter(user=self.request.user).select_related('book', 'review').prefetch_related('book__authors')
     
     def create(self, request, *args, **kwargs):
-      """Make a new Shelf entry, storing the book if not in db"""
-    
       openlibrary_key = request.data.get('openlibrary_key')
       title = request.data.get('title')
+      cover_url = request.data.get('cover_url', '')
+      author_names = request.data.get('authors', [])
 
       if not openlibrary_key:
-        return Response({'error': 'openlibrary_key is required'}, status=status.HTTP_400_BAD_REQUEST)
+          return Response(
+              {'error': 'openlibrary_key is required'},
+              status=status.HTTP_400_BAD_REQUEST
+          )
 
-      if not title:
-        return Response({'error': 'title is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-      if ShelfEntry.objects.filter(user=request.user, book__openlibrary_key=openlibrary_key).exists():
-        return Response({'error': 'Book already on shelf'}, status=status.HTTP_400_BAD_REQUEST)
+      if ShelfEntry.objects.filter(
+          user=request.user,
+          book__openlibrary_key=openlibrary_key
+      ).exists():
+          return Response(
+              {'error': 'Book already on shelf'},
+              status=status.HTTP_400_BAD_REQUEST
+          )
 
       book, created = Book.objects.get_or_create(
           openlibrary_key=openlibrary_key,
           defaults={
-            'title': title,
-            'cover_url': request.data.get('cover_url', ''),
-         }
+              'title': title,
+              'cover_url': cover_url,
+          }
       )
 
       if created:
-        for author_name in request.data.get('authors', []):
-          author, _ = Author.objects.get_or_create(name=author_name)
-          book.authors.add(author)
+          for author_name in author_names:
+              if not author_name or not author_name.strip():
+                  continue
+              author, _ = Author.objects.get_or_create(
+                  name=author_name.strip(),
+                  defaults={
+                      # This is temporary for the MVP. If we wanted to add author profiles, we'd need to backfill this
+                      'openlibrary_key': f'search_{author_name.strip().lower().replace(" ", "_")}',
+                  }
+              )
+              book.authors.add(author)
 
-      shelf_entry = ShelfEntry.objects.create(user=request.user, book=book)
+      shelf_entry = ShelfEntry.objects.create(
+          user=request.user,
+          book=book,
+          status=request.data.get('status', ShelfEntry.Status.WANT_TO_READ)
+      )
 
       return Response(
-        ShelfEntrySerializer(shelf_entry).data,
-        status=status.HTTP_201_CREATED
+          ShelfEntrySerializer(shelf_entry, context={'request': request}).data,
+          status=status.HTTP_201_CREATED
       )

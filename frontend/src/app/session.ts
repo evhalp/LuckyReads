@@ -39,7 +39,7 @@ export function clearSession() {
 
 export function getUserInitials() {
   const user = getStoredUser();
-  const source = user?.name?.trim() || user?.username?.trim() || user?.email?.trim() || "";
+  const source = user?.username?.trim() || user?.email?.trim() || "";
 
   if (!source) {
     return "LR";

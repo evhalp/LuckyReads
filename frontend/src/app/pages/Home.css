@@ -77,33 +77,6 @@
     transform: translateY(-50%);
 }
 
-.home-filters {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.7rem;
-}
-
-.home-filter {
-    padding: 0.65rem 1.05rem;
-    border: 1px solid rgba(239, 232, 220, 0.26);
-    border-radius: 999px;
-    background: rgba(239, 232, 220, 0.18);
-    color: #f8f4eb;
-    font-size: 0.92rem;
-    cursor: pointer;
-    transition:
-        background-color 160ms ease,
-        color 160ms ease,
-        border-color 160ms ease;
-}
-
-.home-filter--active {
-    border-color: transparent;
-    background: #6b7b5a;
-    color: #fdfaf6;
-}
-
 .home-content {
     padding: 4.25rem 0 5rem;
 }

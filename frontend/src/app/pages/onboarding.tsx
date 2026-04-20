@@ -99,7 +99,7 @@ export default function SignupFlow() {
         email: email.trim(),
         password,
         confirmPassword,
-        name: name.trim(),
+        username: name.trim(),
         bio: bio.trim(),
       });
 
@@ -109,7 +109,7 @@ export default function SignupFlow() {
         navigate("/home", {
           state: {
             onboardingComplete: true,
-            profileName: response.user.name ?? name.trim(),
+            profileName: response.user.username ?? name.trim(),
             email: response.user.email,
             bio: response.user.bio ?? bio.trim(),
           },

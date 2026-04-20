@@ -70,14 +70,26 @@ class OpenLibrarySearchView(APIView):
                 status=status.HTTP_502_BAD_GATEWAY
             )
         
-        results = [
-            {
-                'openlibrary_key': doc.get('key'),
-                'title': doc.get('title'),
-                'authors': doc.get('author_name', []),
+        results = []
+        seen_keys = set()
+        seen_title_authors_pairs = set()
+        for doc in response.json().get('docs', []):
+            key = doc.get('key')
+            title = doc.get('title')
+            authors = doc.get('author_name', [])
+            title_authors_pair = (title, frozenset(author.lower() for author in authors))
+
+            if not key or key in seen_keys or title_authors_pair in seen_title_authors_pairs:
+                continue
+            seen_keys.add(key)
+            seen_title_authors_pairs.add(title_authors_pair)
+
+            results.append({
+                'openlibrary_key': key,
+                'title': title,
+                'authors': authors,
                 'cover_url': f'https://covers.openlibrary.org/b/id/{doc["cover_i"]}-M.jpg' if doc.get('cover_i') else ''
-            } for doc in response.json().get('docs', [])
-        ]
+            })
 
         return Response(results)
     

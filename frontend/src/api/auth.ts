@@ -4,9 +4,7 @@ export type AuthUser = {
   id: number;
   username: string;
   email: string;
-  name?: string;
   bio?: string;
-  avatar_url?: string;
 };
 
 export type AuthResponse = {
@@ -18,7 +16,7 @@ export type RegisterPayload = {
   email: string;
   password: string;
   confirmPassword: string;
-  name: string;
+  username: string;
   bio?: string;
 };
 
@@ -26,14 +24,14 @@ export async function registerUser({
   email,
   password,
   confirmPassword,
-  name,
+  username,
   bio,
 }: RegisterPayload) {
   const { data } = await apiClient.post<AuthResponse>("/users/register/", {
     email,
     password,
     confirm_password: confirmPassword,
-    name,
+    username,
     bio: bio ?? "",
   });
 

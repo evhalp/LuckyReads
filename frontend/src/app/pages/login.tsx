@@ -39,7 +39,7 @@ export default function Login() {
       navigate("/home", {
         state: {
           email: response.user.email,
-          profileName: response.user.name,
+          profileName: response.user.username,
         },
       });
     } catch (caughtError) {

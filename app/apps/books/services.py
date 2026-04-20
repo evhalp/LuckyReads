@@ -24,7 +24,7 @@ def get_or_fetch_book(openlibrary_key: str) -> Book:
     authors = []
     for author_entry in work_data.get("authors", []):
         author_key = author_entry.get("author", {}).get("key")
-        if not author_key:
+        if author_key is None or not author_key.strip():
             continue
 
         author_response = requests.get(

@@ -38,7 +38,10 @@ class Command(BaseCommand):
         for data in BOOKS:
             book, was_created = Book.objects.get_or_create(
                 openlibrary_key=data['openlibrary_key'],
-                defaults={'title': data['title']}
+                defaults={
+                    'title': data['title'],
+                    'cover_url': data['cover_url']
+                }
             )
             for author_key in data['authors']:
                 book.authors.add(authors[author_key])
