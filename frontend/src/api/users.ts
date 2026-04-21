@@ -12,6 +12,28 @@ export type BuddyRelationship = {
   buddy: PublicUser;
 };
 
+export type BuddyRecommendation = {
+  id: number;
+  to_user: PublicUser;
+  score?: number | null;
+};
+
+type PaginatedResponse<T> = {
+  results?: T[] | null;
+};
+
+function unwrapListResponse<T>(payload: T[] | PaginatedResponse<T>): T[] {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (payload && Array.isArray(payload.results)) {
+    return payload.results;
+  }
+
+  return [];
+}
+
 export async function fetchCurrentUser(): Promise<AuthUser> {
   const { data } = await apiClient.get<AuthUser>("/users/me/");
   return data;
@@ -51,6 +73,13 @@ export async function removeBuddy(userId: number): Promise<void> {
 export async function fetchBuddies(userId: number): Promise<BuddyRelationship[]> {
   const { data } = await apiClient.get<BuddyRelationship[]>(`/users/${userId}/buddies/`);
   return data;
+}
+
+export async function fetchBuddyRecommendations(): Promise<BuddyRecommendation[]> {
+  const { data } = await apiClient.get<
+    BuddyRecommendation[] | PaginatedResponse<BuddyRecommendation>
+  >("/recommendations/buddies/");
+  return unwrapListResponse(data);
 }
 
 export async function checkBuddyStatus(

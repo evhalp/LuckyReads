@@ -5,6 +5,9 @@ import BookCard from "../../components/BookCard/BookCard";
 import "./MyShelf.css";
 import AddBookModal from "../../components/AddBookModal/AddBookModal";
 import RatingModal from "../../components/RatingModal/RatingModal";
+import BookDetail, {
+    type BookDetailData,
+} from "../../components/BookDetail/BookDetail";
 
 type BookStatus = "want_to_read" | "currently_reading" | "read";
 type ShelfFilter = "all" | BookStatus;
@@ -50,6 +53,9 @@ export default function MyShelf() {
     const [books, setBooks] = useState<ShelfBook[]>([]);
     const [initialRating, setInitialRating] = useState(0);
     const [initialReviewText, setInitialReviewText] = useState("");
+    const [selectedDetailBook, setSelectedDetailBook] =
+        useState<BookDetailData | null>(null);
+    const [isBookDetailOpen, setIsBookDetailOpen] = useState(false);
 
     useEffect(() => {
         fetchShelf();
@@ -101,6 +107,11 @@ export default function MyShelf() {
 
     async function handleStatusChange(bookId: number, newStatus: BookStatus) {
         await apiClient.patch(`/books/shelf/${bookId}/`, { status: newStatus });
+        await fetchShelf();
+    }
+
+    async function handleDeleteBook(bookId: number) {
+        await apiClient.delete(`/books/shelf/${bookId}/`);
         await fetchShelf();
     }
 
@@ -174,6 +185,16 @@ export default function MyShelf() {
             ? books
             : books.filter((book) => book.status === activeTab);
 
+    function handleBookClick(book: ShelfBook) {
+        setSelectedDetailBook({
+            id: String(book.id),
+            title: book.title,
+            author: book.author,
+            coverUrl: book.coverUrl,
+        });
+        setIsBookDetailOpen(true);
+    }
+
     return (
         <div className="my-shelf">
             <Navbar />
@@ -221,10 +242,13 @@ export default function MyShelf() {
                             author={book.author}
                             coverUrl={book.coverUrl}
                             status={book.status}
+                            rating={book.rating}
                             onStatusChange={(newStatus) =>
                                 handleStatusChange(book.id, newStatus)
                             }
                             onRateClick={() => openRatingModal(book)}
+                            onDelete={() => handleDeleteBook(book.id)}
+                            onClick={() => handleBookClick(book)}
                         />
                     ))}
                 </div>
@@ -247,6 +271,14 @@ export default function MyShelf() {
                     initialReview={initialReviewText}
                 />
             </div>
+
+            {selectedDetailBook && (
+                <BookDetail
+                    book={selectedDetailBook}
+                    isOpen={isBookDetailOpen}
+                    onClose={() => setIsBookDetailOpen(false)}
+                />
+            )}
         </div>
     );
 }

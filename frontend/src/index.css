@@ -307,25 +307,3 @@ a {
         width: 100%;
     }
 }
-
-.api-health-banner {
-    padding: 0.5rem 1rem;
-    font-size: 0.8125rem;
-    text-align: center;
-    border-bottom: 1px solid rgba(29, 36, 51, 0.12);
-}
-
-.api-health-banner-loading {
-    background: rgba(255, 255, 255, 0.65);
-    color: #3d4a63;
-}
-
-.api-health-banner-ok {
-    background: rgba(209, 250, 229, 0.85);
-    color: #065f46;
-}
-
-.api-health-banner-error {
-    background: rgba(254, 226, 226, 0.95);
-    color: #991b1b;
-}
