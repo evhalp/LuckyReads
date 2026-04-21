@@ -39,6 +39,7 @@ class BookDetailSerializer(serializers.ModelSerializer):
         model = Book
         fields = [
             'id',
+            'openlibrary_key',
             'title',
             'author',
             'coverUrl',

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import BookCard from "../../components/books/BookCard";
-import BookDetail, { type BookDetailData } from "../../components/BookDetail/BookDetail";
+import BookDetail, {
+    type BookDetailData,
+} from "../../components/BookDetail/BookDetail";
 import {
     fetchBookDetail,
     fetchRecommendations,
@@ -9,6 +11,7 @@ import {
     type DisplayBook,
 } from "../../services/books";
 import "./Home.css";
+import { apiClient } from "../../api/client";
 
 const SKELETON_COUNT = 6;
 
@@ -38,7 +41,9 @@ export default function Home() {
     const [loadingRecommendations, setLoadingRecommendations] = useState(true);
     const [loadingSearch, setLoadingSearch] = useState(false);
     const [error, setError] = useState("");
-    const [selectedBook, setSelectedBook] = useState<BookDetailData | null>(null);
+    const [selectedBook, setSelectedBook] = useState<BookDetailData | null>(
+        null,
+    );
     const [isBookDetailOpen, setIsBookDetailOpen] = useState(false);
     const [loadingBookDetail, setLoadingBookDetail] = useState(false);
 
@@ -140,6 +145,7 @@ export default function Home() {
     const handleBookClick = async (book: DisplayBook) => {
         setSelectedBook({
             id: book.id,
+            openlibrary_key: book.openlibrary_key,
             title: book.title,
             author: book.author,
             coverUrl: book.coverUrl,
@@ -153,6 +159,7 @@ export default function Home() {
             setSelectedBook((current) => ({
                 ...(current ?? {
                     id: book.id,
+                    openlibrary_key: book.openlibrary_key,
                     title: book.title,
                     author: book.author,
                     coverUrl: book.coverUrl,
@@ -168,6 +175,20 @@ export default function Home() {
         }
     };
 
+    async function handleAddToShelf(book: BookDetailData) {
+        try {
+            await apiClient.post("/books/shelf/", {
+                openlibrary_key: book.openlibrary_key,
+                title: book.title,
+                cover_url: book.cover_url || book.coverUrl || "",
+                authors: book.authors || (book.author ? [book.author] : []),
+                status: "want_to_read",
+            });
+        } catch (error) {
+            console.error("Failed to add book:", error);
+        }
+    }
+
     return (
         <div className="home-page">
             <Navbar />
@@ -179,7 +200,10 @@ export default function Home() {
                             What will you read next?
                         </h1>
 
-                        <label className="home-search" aria-label="Search books">
+                        <label
+                            className="home-search"
+                            aria-label="Search books"
+                        >
                             <SearchIcon />
                             <input
                                 type="search"
@@ -208,7 +232,10 @@ export default function Home() {
                         </div>
 
                         {error && !showInlineWarning ? (
-                            <div className="home-state home-state--error" role="alert">
+                            <div
+                                className="home-state home-state--error"
+                                role="alert"
+                            >
                                 <p>{error}</p>
                             </div>
                         ) : null}
@@ -221,16 +248,27 @@ export default function Home() {
 
                         {isLoading ? (
                             <div className="home-grid" aria-hidden="true">
-                                {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-                                    <div key={index} className="home-card-skeleton" />
-                                ))}
+                                {Array.from(
+                                    { length: SKELETON_COUNT },
+                                    (_, index) => (
+                                        <div
+                                            key={index}
+                                            className="home-card-skeleton"
+                                        />
+                                    ),
+                                )}
                             </div>
                         ) : null}
 
-                        {!showInlineWarning && !error && !isLoading && cards.length === 0 ? (
+                        {!showInlineWarning &&
+                        !error &&
+                        !isLoading &&
+                        cards.length === 0 ? (
                             <div className="home-state home-state--empty">
                                 <p>No results found.</p>
-                                <p>Try a different title, author, or keyword.</p>
+                                <p>
+                                    Try a different title, author, or keyword.
+                                </p>
                             </div>
                         ) : null}
 
@@ -255,6 +293,7 @@ export default function Home() {
                     isOpen={isBookDetailOpen}
                     isLoading={loadingBookDetail}
                     onClose={() => setIsBookDetailOpen(false)}
+                    onAddToShelf={handleAddToShelf}
                 />
             )}
         </div>

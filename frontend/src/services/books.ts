@@ -23,6 +23,7 @@ type ApiBookDetailReview = {
 
 type ApiBookDetail = {
     id?: number | string;
+    openlibrary_key?: string | null;
     title?: string | null;
     author?: string | null;
     coverUrl?: string | null;
@@ -45,6 +46,7 @@ type PaginatedResponse<T> = {
 
 export type DisplayBook = {
     id: string;
+    openlibrary_key: string;
     title: string;
     author: string;
     coverUrl?: string;
@@ -53,6 +55,7 @@ export type DisplayBook = {
 
 export type DisplayBookDetail = {
     id: string;
+    openlibrary_key?: string;
     title: string;
     author: string;
     coverUrl?: string;
@@ -68,7 +71,10 @@ export type DisplayBookDetail = {
     }[];
 };
 
-function mapBook(book: ApiBook, recommendation?: ApiRecommendation): DisplayBook {
+function mapBook(
+    book: ApiBook,
+    recommendation?: ApiRecommendation,
+): DisplayBook {
     const authors = Array.isArray(book.authors)
         ? book.authors
               .map((author) => author.name?.trim())
@@ -81,7 +87,9 @@ function mapBook(book: ApiBook, recommendation?: ApiRecommendation): DisplayBook
                   0,
                   Math.min(
                       100,
-                      rawScore <= 1 ? Math.round(rawScore * 100) : Math.round(rawScore),
+                      rawScore <= 1
+                          ? Math.round(rawScore * 100)
+                          : Math.round(rawScore),
                   ),
               )
             : undefined;
@@ -94,6 +102,7 @@ function mapBook(book: ApiBook, recommendation?: ApiRecommendation): DisplayBook
                 book.title ??
                 "book-card",
         ),
+        openlibrary_key: book.openlibrary_key?.trim() || "",
         title: book.title?.trim() || "Untitled book",
         author: authors.join(", ") || "Unknown author",
         coverUrl: book.cover_url?.trim() || undefined,
@@ -113,6 +122,7 @@ function mapBookDetail(data: ApiBookDetail): DisplayBookDetail {
 
     return {
         id: String(data.id ?? "book-detail"),
+        openlibrary_key: data.openlibrary_key?.trim() || undefined,
         title: data.title?.trim() || "Untitled book",
         author: data.author?.trim() || "Unknown author",
         coverUrl: data.coverUrl?.trim() || undefined,
@@ -140,23 +150,29 @@ function unwrapListResponse<T>(payload: T[] | PaginatedResponse<T>): T[] {
 }
 
 export async function fetchRecommendations(): Promise<DisplayBook[]> {
-    const response = await apiClient.get<ApiRecommendation[] | PaginatedResponse<ApiRecommendation>>(
-        "/recommendations/books/",
-    );
+    const response = await apiClient.get<
+        ApiRecommendation[] | PaginatedResponse<ApiRecommendation>
+    >("/recommendations/books/");
     return unwrapListResponse(response.data).map((item) =>
         mapBook(item.book ?? {}, item),
     );
 }
 
 export async function searchBooks(query: string): Promise<DisplayBook[]> {
-    const response = await apiClient.get<ApiBook[] | PaginatedResponse<ApiBook>>("/books/", {
+    const response = await apiClient.get<
+        ApiBook[] | PaginatedResponse<ApiBook>
+    >("/books/", {
         params: { search: query },
     });
 
     return unwrapListResponse(response.data).map((book) => mapBook(book));
 }
 
-export async function fetchBookDetail(bookId: string): Promise<DisplayBookDetail> {
-    const response = await apiClient.get<ApiBookDetail>(`/books/${bookId}/detail/`);
+export async function fetchBookDetail(
+    bookId: string,
+): Promise<DisplayBookDetail> {
+    const response = await apiClient.get<ApiBookDetail>(
+        `/books/${bookId}/detail/`,
+    );
     return mapBookDetail(response.data);
 }

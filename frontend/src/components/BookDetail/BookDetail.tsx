@@ -6,6 +6,11 @@ export interface BookDetailData {
     title: string;
     author: string;
     coverUrl?: string;
+
+    openlibrary_key?: string;
+    authors?: string[];
+    cover_url?: string;
+
     rating?: number;
     matchPercentage?: number;
     genres?: string[];
@@ -34,7 +39,7 @@ export interface DisplayBookPreview {
 interface BookDetailProps {
     book: BookDetailData;
     onClose: () => void;
-    onAddToShelf?: (bookId: string) => void;
+    onAddToShelf?: (book: BookDetailData) => void | Promise<void>;
     onWriteReview?: (bookId: string) => void;
     isOpen: boolean;
     isLoading?: boolean;
@@ -44,7 +49,6 @@ export default function BookDetail({
     book,
     onClose,
     onAddToShelf,
-    onWriteReview,
     isOpen,
     isLoading = false,
 }: BookDetailProps) {
@@ -71,9 +75,9 @@ export default function BookDetail({
                     {/* Left Column - Cover and Actions */}
                     <div className="book-detail-left">
                         <div className="book-detail-cover">
-                            {book.coverUrl ? (
+                            {book.coverUrl || book.cover_url ? (
                                 <img
-                                    src={book.coverUrl}
+                                    src={book.coverUrl || book.cover_url}
                                     alt={`Cover of ${book.title}`}
                                     className="book-detail-image"
                                 />
@@ -83,21 +87,16 @@ export default function BookDetail({
                                 </div>
                             )}
                         </div>
-
-                        <div className="book-detail-actions">
-                            <button
-                                className="book-detail-btn book-detail-btn--primary"
-                                onClick={() => onAddToShelf?.(book.id)}
-                            >
-                                Add to Shelf
-                            </button>
-                            <button
-                                className="book-detail-btn book-detail-btn--secondary"
-                                onClick={() => onWriteReview?.(book.id)}
-                            >
-                                Write Review
-                            </button>
-                        </div>
+                        {onAddToShelf && (
+                            <div className="book-detail-actions">
+                                <button
+                                    className="book-detail-btn book-detail-btn--primary"
+                                    onClick={() => onAddToShelf(book)}
+                                >
+                                    Add to Shelf
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Right Column - Details */}
@@ -105,14 +104,21 @@ export default function BookDetail({
                         {/* Header */}
                         <div className="book-detail-header">
                             <h1 className="book-detail-title">{book.title}</h1>
-                            <p className="book-detail-author">by {book.author}</p>
+                            <p className="book-detail-author">
+                                by{" "}
+                                {book.author ||
+                                    book.authors?.join(", ") ||
+                                    "Unknown author"}
+                            </p>
                         </div>
 
                         {/* Rating and Match */}
                         <div className="book-detail-meta-top">
                             <div className="book-detail-rating">
                                 <span className="rating-value">
-                                    {typeof book.rating === "number" ? book.rating : "-"}
+                                    {typeof book.rating === "number"
+                                        ? book.rating
+                                        : "-"}
                                 </span>
                                 <span className="rating-stars">
                                     {typeof book.rating === "number"
@@ -159,7 +165,9 @@ export default function BookDetail({
                             )}
                             {book.published && (
                                 <div className="info-item">
-                                    <span className="info-label">Published:</span>
+                                    <span className="info-label">
+                                        Published:
+                                    </span>
                                     <span className="info-value">
                                         {book.published}
                                     </span>
@@ -179,7 +187,8 @@ export default function BookDetail({
                             <p className="section-content">
                                 {isLoading
                                     ? "Loading summary..."
-                                    : (book.about?.trim() || "No summary available for this book yet.")}
+                                    : book.about?.trim() ||
+                                      "No summary available for this book yet."}
                             </p>
                         </div>
 
@@ -187,7 +196,9 @@ export default function BookDetail({
                         <div className="book-detail-section">
                             <h2 className="section-title">Reviews</h2>
                             {isLoading ? (
-                                <p className="section-content">Loading reviews...</p>
+                                <p className="section-content">
+                                    Loading reviews...
+                                </p>
                             ) : book.reviews && book.reviews.length > 0 ? (
                                 <div className="reviews-list">
                                     {book.reviews.map((review) => (
@@ -210,7 +221,9 @@ export default function BookDetail({
                                     ))}
                                 </div>
                             ) : (
-                                <p className="section-content">No reviews yet.</p>
+                                <p className="section-content">
+                                    No reviews yet.
+                                </p>
                             )}
                         </div>
 
