@@ -48,3 +48,10 @@ LOGGING = {
         'level': 'WARNING',
     },
 }
+
+REST_FRAMEWORK = {
+    **REST_FRAMEWORK,  # inherit base settings
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",  # JSON only, no browser UI
+    ],
+}

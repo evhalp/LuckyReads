@@ -5,7 +5,6 @@ import { BackendHealthBanner } from "./components/BackendHealthBanner";
 export default function App() {
   return (
     <>
-      <BackendHealthBanner />
       <RouterProvider router={router} />
     </>
   );

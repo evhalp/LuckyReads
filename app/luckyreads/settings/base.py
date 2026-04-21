@@ -67,7 +67,7 @@ INSTALLED_APPS = [
     "drf_standardized_errors",
     "django_filters",
     'channels',
-    
+    'corsheaders',
     'apps.core',
 
     'apps.users',
@@ -77,6 +77,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -128,9 +129,9 @@ CSRF_COOKIE_SECURE = environ_bool("CSRF_COOKIE_SECURE", False)
 SESSION_COOKIE_SECURE = environ_bool("SESSION_COOKIE_SECURE", False)
 
 # CORS Settings (django-cors-headers not installed)
-# CORS_ALLOWED_ORIGINS = CSRF_TRUSTED_ORIGINS
-# CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
-# CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = CSRF_TRUSTED_ORIGINS
+CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
+CORS_ALLOW_CREDENTIALS = True
 
 # Other auth settings
 AUTH_USER_MODEL = "users.User"

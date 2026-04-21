@@ -1,0 +1,9 @@
+{
+  "name": "luckyreads",
+  "compatibility_date": "2026-04-20",
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./dist"
+  }
+}
