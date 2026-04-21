@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import { fetchUserProfile, type PublicUserProfile } from "../../api/users";
@@ -10,7 +10,7 @@ function getInitials(name: string): string {
   return (
     parts
       .slice(0, 2)
-      .map((p) => p[0]?.toUpperCase() ?? "")
+      .map((part) => part[0]?.toUpperCase() ?? "")
       .join("") || "LR"
   );
 }
@@ -18,9 +18,12 @@ function getInitials(name: string): string {
 function StarRating({ rating }: { rating: number }) {
   return (
     <span className="rp-stars" aria-label={`${rating} out of 5 stars`}>
-      {Array.from({ length: 5 }, (_, i) => (
-        <span key={i} className={i < rating ? "rp-star rp-star--filled" : "rp-star"}>
-          ★
+      {Array.from({ length: 5 }, (_, index) => (
+        <span
+          key={index}
+          className={index < rating ? "rp-star rp-star--filled" : "rp-star"}
+        >
+          *
         </span>
       ))}
     </span>
@@ -93,7 +96,7 @@ export default function ReaderProfile() {
             type="button"
             onClick={() => navigate("/find-readers")}
           >
-            ← Back to Find Readers
+            Back to Find Readers
           </button>
 
           {user ? (
@@ -111,7 +114,7 @@ export default function ReaderProfile() {
       <main className="rp-shell rp-main">
         {loading ? (
           <div className="rp-state">
-            <p>Loading profile…</p>
+            <p>Loading profile...</p>
           </div>
         ) : error ? (
           <div className="rp-state rp-state--error" role="alert">
@@ -166,9 +169,7 @@ export default function ReaderProfile() {
                   ))}
                 </ul>
               ) : (
-                <p className="rp-empty">
-                  This reader has not posted any reviews yet.
-                </p>
+                <p className="rp-empty">This reader has not posted any reviews yet.</p>
               )}
             </section>
           </div>
