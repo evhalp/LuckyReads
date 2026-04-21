@@ -16,6 +16,7 @@ app_name = "api-books"
 
 urlpatterns = [
     path('', views.BookListView.as_view(), name='book-list'),
+    path('<int:pk>/detail/', views.BookDetailView.as_view(), name='book-detail'),
     path('olsearch/', views.OpenLibrarySearchView.as_view(), name='book-olsearch'),
     *router.urls
 ]

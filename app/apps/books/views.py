@@ -10,7 +10,13 @@ from rest_framework.response import Response
 
 from apps.core.abstracts.viewsets import ViewSetBase
 from apps.books.models import Author, Book, Review, ShelfEntry
-from apps.books.serializers import BookSerializer, ReviewSerializer, ShelfEntrySerializer
+from apps.books.serializers import (
+    BookDetailSerializer,
+    BookPopupReviewSerializer,
+    BookSerializer,
+    ReviewSerializer,
+    ShelfEntrySerializer,
+)
 
 class BookListView(generics.ListAPIView):
     """
@@ -92,4 +98,82 @@ class OpenLibrarySearchView(APIView):
             })
 
         return Response(results)
+
+
+class BookDetailView(APIView):
+    """
+    GET /api/books/{id}/detail/
+    """
+
+    def _normalize_openlibrary_key(self, openlibrary_key: str) -> str:
+        if not openlibrary_key:
+            return ""
+        return openlibrary_key if openlibrary_key.startswith("/") else f"/{openlibrary_key}"
+
+    def _fetch_openlibrary_metadata(self, book: Book) -> dict:
+        default_data = {
+            "about": "",
+            "genres": [],
+            "isbn": book.isbn or "",
+        }
+
+        key = self._normalize_openlibrary_key(book.openlibrary_key)
+        if not key:
+            return default_data
+
+        try:
+            work_response = requests.get(
+                f"https://openlibrary.org{key}.json",
+                timeout=8,
+            )
+            if not work_response.ok:
+                return default_data
+
+            work_data = work_response.json()
+
+            description = work_data.get("description", "")
+            about = description.get("value", "") if isinstance(description, dict) else description
+
+            subjects = work_data.get("subjects", [])
+            genres = [subject for subject in subjects if isinstance(subject, str)][:8]
+
+            isbn = book.isbn or ""
+            if not isbn and work_data.get("key"):
+                editions_response = requests.get(
+                    f"https://openlibrary.org{work_data.get('key')}/editions.json?limit=1",
+                    timeout=8,
+                )
+                if editions_response.ok:
+                    entries = editions_response.json().get("entries", [])
+                    if entries:
+                        identifiers = entries[0].get("isbn_13") or entries[0].get("isbn_10") or []
+                        if identifiers:
+                            isbn = identifiers[0]
+
+            return {
+                "about": about or "",
+                "genres": genres,
+                "isbn": isbn,
+            }
+        except requests.RequestException:
+            return default_data
+
+    def get(self, request, pk: int) -> Response:
+        book = generics.get_object_or_404(Book.objects.prefetch_related('authors'), id=pk)
+
+        metadata = self._fetch_openlibrary_metadata(book)
+        reviews = (
+            Review.objects
+            .filter(shelf_entry__book=book)
+            .select_related('shelf_entry__user')
+            .order_by('-created_at')
+        )
+
+        payload = BookDetailSerializer(book).data
+        payload["about"] = metadata["about"]
+        payload["genres"] = metadata["genres"]
+        payload["isbn"] = metadata["isbn"] or payload.get("isbn")
+        payload["reviews"] = BookPopupReviewSerializer(reviews, many=True).data
+
+        return Response(payload)
     

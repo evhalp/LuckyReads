@@ -10,6 +10,27 @@ type ApiBook = {
     title?: string | null;
     authors?: ApiAuthor[] | null;
     cover_url?: string | null;
+    isbn?: string | null;
+    average_rating?: number | null;
+};
+
+type ApiBookDetailReview = {
+    id?: number | string;
+    author?: string | null;
+    rating?: number | null;
+    text?: string | null;
+};
+
+type ApiBookDetail = {
+    id?: number | string;
+    title?: string | null;
+    author?: string | null;
+    coverUrl?: string | null;
+    isbn?: string | null;
+    rating?: number | null;
+    about?: string | null;
+    genres?: string[] | null;
+    reviews?: ApiBookDetailReview[] | null;
 };
 
 type ApiRecommendation = {
@@ -28,6 +49,23 @@ export type DisplayBook = {
     author: string;
     coverUrl?: string;
     matchPercentage?: number;
+};
+
+export type DisplayBookDetail = {
+    id: string;
+    title: string;
+    author: string;
+    coverUrl?: string;
+    rating?: number;
+    genres?: string[];
+    isbn?: string;
+    about?: string;
+    reviews?: {
+        id: string;
+        author: string;
+        rating: number;
+        text: string;
+    }[];
 };
 
 function mapBook(book: ApiBook, recommendation?: ApiRecommendation): DisplayBook {
@@ -50,8 +88,8 @@ function mapBook(book: ApiBook, recommendation?: ApiRecommendation): DisplayBook
 
     return {
         id: String(
-            recommendation?.id ??
-                book.id ??
+            book.id ??
+                recommendation?.id ??
                 book.openlibrary_key ??
                 book.title ??
                 "book-card",
@@ -60,6 +98,32 @@ function mapBook(book: ApiBook, recommendation?: ApiRecommendation): DisplayBook
         author: authors.join(", ") || "Unknown author",
         coverUrl: book.cover_url?.trim() || undefined,
         matchPercentage,
+    };
+}
+
+function mapBookDetail(data: ApiBookDetail): DisplayBookDetail {
+    const reviews = Array.isArray(data.reviews)
+        ? data.reviews.map((review, index) => ({
+              id: String(review.id ?? `review-${index}`),
+              author: review.author?.trim() || "Reader",
+              rating: typeof review.rating === "number" ? review.rating : 0,
+              text: review.text?.trim() || "",
+          }))
+        : [];
+
+    return {
+        id: String(data.id ?? "book-detail"),
+        title: data.title?.trim() || "Untitled book",
+        author: data.author?.trim() || "Unknown author",
+        coverUrl: data.coverUrl?.trim() || undefined,
+        rating:
+            typeof data.rating === "number"
+                ? Math.round(data.rating * 10) / 10
+                : undefined,
+        genres: Array.isArray(data.genres) ? data.genres.filter(Boolean) : [],
+        isbn: data.isbn?.trim() || undefined,
+        about: data.about?.trim() || undefined,
+        reviews,
     };
 }
 
@@ -90,4 +154,9 @@ export async function searchBooks(query: string): Promise<DisplayBook[]> {
     });
 
     return unwrapListResponse(response.data).map((book) => mapBook(book));
+}
+
+export async function fetchBookDetail(bookId: string): Promise<DisplayBookDetail> {
+    const response = await apiClient.get<ApiBookDetail>(`/books/${bookId}/detail/`);
+    return mapBookDetail(response.data);
 }

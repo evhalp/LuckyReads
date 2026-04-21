@@ -3,6 +3,7 @@ import Navbar from "../../components/Navbar/Navbar";
 import BookCard from "../../components/books/BookCard";
 import BookDetail, { type BookDetailData } from "../../components/BookDetail/BookDetail";
 import {
+    fetchBookDetail,
     fetchRecommendations,
     searchBooks,
     type DisplayBook,
@@ -39,6 +40,7 @@ export default function Home() {
     const [error, setError] = useState("");
     const [selectedBook, setSelectedBook] = useState<BookDetailData | null>(null);
     const [isBookDetailOpen, setIsBookDetailOpen] = useState(false);
+    const [loadingBookDetail, setLoadingBookDetail] = useState(false);
 
     const trimmedQuery = searchQuery.trim();
     const hasSearchQuery = debouncedQuery.length > 0;
@@ -135,7 +137,7 @@ export default function Home() {
     const isLoading = hasSearchQuery ? loadingSearch : loadingRecommendations;
     const showInlineWarning = Boolean(error) && cards.length > 0;
 
-    const handleBookClick = (book: DisplayBook) => {
+    const handleBookClick = async (book: DisplayBook) => {
         setSelectedBook({
             id: book.id,
             title: book.title,
@@ -144,6 +146,26 @@ export default function Home() {
             matchPercentage: book.matchPercentage,
         });
         setIsBookDetailOpen(true);
+
+        setLoadingBookDetail(true);
+        try {
+            const details = await fetchBookDetail(book.id);
+            setSelectedBook((current) => ({
+                ...(current ?? {
+                    id: book.id,
+                    title: book.title,
+                    author: book.author,
+                    coverUrl: book.coverUrl,
+                    matchPercentage: book.matchPercentage,
+                }),
+                ...details,
+                matchPercentage: book.matchPercentage,
+            }));
+        } catch {
+            // Keep the popup open with base card data when detail call fails.
+        } finally {
+            setLoadingBookDetail(false);
+        }
     };
 
     return (
@@ -231,6 +253,7 @@ export default function Home() {
                 <BookDetail
                     book={selectedBook}
                     isOpen={isBookDetailOpen}
+                    isLoading={loadingBookDetail}
                     onClose={() => setIsBookDetailOpen(false)}
                 />
             )}

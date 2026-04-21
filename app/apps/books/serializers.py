@@ -17,6 +17,45 @@ class BookSerializer(ModelSerializer):
         fields = ['id', 'openlibrary_key', 'title', 'authors', 'cover_url', 'isbn', "average_rating"]
 
 
+class BookPopupReviewSerializer(serializers.ModelSerializer):
+    author = serializers.CharField(source='shelf_entry.user.username', read_only=True)
+    text = serializers.CharField(source='review_text', read_only=True)
+
+    class Meta:
+        model = Review
+        fields = ['id', 'author', 'rating', 'text', 'created_at']
+        read_only_fields = fields
+
+
+class BookDetailSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField()
+    coverUrl = serializers.CharField(source='cover_url', read_only=True)
+    rating = serializers.FloatField(source='average_rating', read_only=True)
+    about = serializers.CharField(read_only=True)
+    genres = serializers.ListField(child=serializers.CharField(), read_only=True)
+    reviews = serializers.ListField(read_only=True)
+
+    class Meta:
+        model = Book
+        fields = [
+            'id',
+            'title',
+            'author',
+            'coverUrl',
+            'isbn',
+            'rating',
+            'about',
+            'genres',
+            'reviews',
+        ]
+
+    def get_author(self, obj: Book) -> str:
+        authors = obj.authors.all()
+        if not authors:
+            return 'Unknown author'
+        return ', '.join(author.name for author in authors)
+
+
 class ReviewSerializer(ModelSerializer):
     shelf_entry_id = serializers.IntegerField(write_only=True)
     rating = serializers.IntegerField(min_value=1, max_value=5)
