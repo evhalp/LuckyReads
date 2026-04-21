@@ -17,6 +17,7 @@ from apps.users.serializers import (
     UserSerializer,
     PublicUserSerializer,
     ReaderListUserSerializer,
+    BuddyRelationshipSerializer,
 )
 
 @extend_schema(
@@ -152,6 +153,36 @@ class UserViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, ViewSetBase)
         ).exists()
 
         return Response({"are_buddies": are_buddies})
+
+    @action(detail=True, methods=["get", "delete"], url_path=r"buddies/(?P<buddy_id>[^/.]+)")
+    def legacy_buddy(self, request, buddy_id=None, *args, **kwargs):
+        """Backward-compatible endpoint for legacy clients using /buddies/{buddy_id}."""
+        target_user = generics.get_object_or_404(
+            User, id=self.kwargs['pk'], is_active=True
+        )
+        self.check_object_permissions(request, target_user)
+
+        buddy = generics.get_object_or_404(User, id=buddy_id, is_active=True)
+
+        if request.method == 'GET':
+            are_buddies = BuddyRelationship.objects.filter(
+                user=target_user,
+                buddy=buddy,
+            ).exists()
+            return Response({"are_buddies": are_buddies})
+
+        was_deleted, _ = BuddyRelationship.objects.filter(
+            user=target_user,
+            buddy=buddy,
+        ).delete()
+
+        if not was_deleted:
+            return Response(
+                {'error': 'You are not buddies with this user'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @add_buddy.mapping.delete
     def remove_buddy(self, request, *args, **kwargs):

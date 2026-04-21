@@ -28,6 +28,13 @@ type ApiRecommendation = {
     score?: number | null;
 };
 
+type OpenLibrarySearchResult = {
+    openlibrary_key?: string | null;
+    title?: string | null;
+    authors?: string[] | null;
+    cover_url?: string | null;
+};
+
 type PaginatedResponse<T> = {
     results?: T[] | null;
 };
@@ -152,6 +159,20 @@ function mapBook(book: ApiBook, recommendation?: ApiRecommendation): DisplayBook
     };
 }
 
+function mapOpenLibraryBook(result: OpenLibrarySearchResult): DisplayBook {
+    const authors = Array.isArray(result.authors)
+        ? result.authors.map((author) => author.trim()).filter(Boolean)
+        : [];
+
+    return {
+        id: String(result.openlibrary_key ?? result.title ?? "openlibrary-book"),
+        title: result.title?.trim() || "Untitled book",
+        author: authors.join(", ") || "Unknown author",
+        coverUrl: result.cover_url?.trim() || undefined,
+        openLibraryKey: result.openlibrary_key?.trim() || undefined,
+    };
+}
+
 function unwrapListResponse<T>(payload: T[] | PaginatedResponse<T>): T[] {
     if (Array.isArray(payload)) {
         return payload;
@@ -183,7 +204,20 @@ export async function searchBooks(query: string): Promise<DisplayBook[]> {
         params: { search: query },
     });
 
-    return unwrapListResponse(response.data).map((book) => mapBook(book));
+    const localResults = unwrapListResponse(response.data).map((book) => mapBook(book));
+    if (localResults.length > 0) {
+        return localResults;
+    }
+
+    return searchOpenLibraryBooks(query);
+}
+
+export async function searchOpenLibraryBooks(query: string): Promise<DisplayBook[]> {
+    const response = await apiClient.get<OpenLibrarySearchResult[]>("/books/olsearch/", {
+        params: { q: query },
+    });
+
+    return response.data.map((book) => mapOpenLibraryBook(book));
 }
 
 export async function fetchOpenLibraryBookDetails(input: {

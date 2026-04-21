@@ -45,6 +45,22 @@ type ShelfEntry = {
     };
 };
 
+function mapShelfEntry(entry: ShelfEntry): ShelfBook {
+    return {
+        id: entry.id,
+        isbn: entry.book?.isbn || "",
+        title: entry.book?.title || "Unknown title",
+        author:
+            entry.book?.authors
+                ?.map((author: { name: string }) => author.name)
+                .join(", ") || "Unknown author",
+        status: entry.status,
+        coverUrl: entry.book?.cover_url || undefined,
+        rating: entry.review?.rating,
+        reviewId: entry.review?.id,
+    };
+}
+
 export default function MyShelf() {
     const [activeTab, setActiveTab] = useState<ShelfFilter>("all");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -69,21 +85,7 @@ export default function MyShelf() {
                 ? response.data
                 : response.data.results || [];
 
-            const formattedBooks: ShelfBook[] = shelfEntries.map(
-                (entry: ShelfEntry) => ({
-                    id: entry.id,
-                    isbn: entry.book?.isbn || "",
-                    title: entry.book?.title || "Unknown title",
-                    author:
-                        entry.book?.authors
-                            ?.map((author: any) => author.name)
-                            .join(", ") || "Unknown author",
-                    status: entry.status,
-                    coverUrl: entry.book?.cover_url || undefined,
-                    rating: entry.review?.rating,
-                    reviewId: entry.review?.id,
-                }),
-            );
+            const formattedBooks: ShelfBook[] = shelfEntries.map(mapShelfEntry);
             setBooks(formattedBooks);
         } catch (error) {
             console.error("Failed to fetch shelf:", error);
@@ -92,16 +94,24 @@ export default function MyShelf() {
 
     async function handleAddBook(book: SearchResult, status: BookStatus) {
         try {
-            await apiClient.post("/books/shelf/", {
+            const response = await apiClient.post<ShelfEntry>("/books/shelf/", {
                 openlibrary_key: book.openlibrary_key,
                 title: book.title,
                 cover_url: book.cover_url || "",
                 authors: book.authors || [],
                 status,
             });
+
+            const addedBook = mapShelfEntry(response.data);
+            setBooks((current) => {
+                const withoutDuplicate = current.filter((item) => item.id !== addedBook.id);
+                return [addedBook, ...withoutDuplicate];
+            });
+            setActiveTab("all");
             await fetchShelf();
         } catch (error) {
             console.error("Failed to add book:", error);
+            throw error;
         }
     }
 

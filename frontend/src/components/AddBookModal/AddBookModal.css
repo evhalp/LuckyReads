@@ -33,6 +33,12 @@
     gap: 16px;
 }
 
+.modal-row label {
+    color: #3f4a34;
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
 .modal-row input {
     width: 100%;
     height: 2.75rem;
@@ -42,6 +48,17 @@
     color: #2f3726;
     font-size: 1rem;
     box-shadow: 0 10px 28px rgba(26, 33, 22, 0.12);
+}
+
+.modal-row select {
+    width: 100%;
+    height: 2.75rem;
+    padding: 0 12px;
+    border: 1px solid rgba(198, 181, 147, 0.45);
+    border-radius: 999px;
+    color: #2f3726;
+    background: #fff;
+    font-size: 0.95rem;
 }
 
 .modal button {
@@ -71,6 +88,13 @@
     gap: 1.25rem;
     align-items: stretch;
     justify-content: start;
+}
+
+.modal-error {
+    margin: 8px 0 12px;
+    color: #9d3f3f;
+    font-size: 0.92rem;
+    line-height: 1.4;
 }
 
 .search-result-card {
