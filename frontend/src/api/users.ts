@@ -7,6 +7,22 @@ export type PublicUser = {
   bio?: string;
 };
 
+export type UserProfileReview = {
+  id: number;
+  book_title: string;
+  rating: number;
+  review_text: string;
+  created_at: string;
+};
+
+export type PublicUserProfile = {
+  id: number;
+  name: string;
+  email: string;
+  bio?: string;
+  reviews: UserProfileReview[];
+};
+
 export type BuddyRelationship = {
   id: number;
   buddy: PublicUser;
@@ -58,6 +74,11 @@ export async function searchUserByUsername(username: string): Promise<PublicUser
   const { data } = await apiClient.get<PublicUser>("/users/search/", {
     params: { username },
   });
+  return data;
+}
+
+export async function fetchUserProfile(userId: number): Promise<PublicUserProfile> {
+  const { data } = await apiClient.get<PublicUserProfile>(`/users/${userId}/profile/`);
   return data;
 }
 

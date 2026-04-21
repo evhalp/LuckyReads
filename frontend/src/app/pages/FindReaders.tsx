@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import {
   addBuddy,
@@ -54,12 +55,14 @@ function ReaderCard({
   actionLoading,
   note,
   onToggleBuddy,
+  onViewProfile,
 }: {
   user: PublicUser;
   status: "self" | "buddy" | "not_buddy";
   actionLoading: boolean;
   note?: string;
   onToggleBuddy: (user: PublicUser, isBuddy: boolean) => void;
+  onViewProfile: (userId: number) => void;
 }) {
   const displayName = getDisplayName(user);
   const buttonLabel =
@@ -95,11 +98,19 @@ function ReaderCard({
             : "Adding..."
           : buttonLabel}
       </button>
+      <button
+        type="button"
+        className="reader-card__link"
+        onClick={() => onViewProfile(user.id)}
+      >
+        View profile
+      </button>
     </article>
   );
 }
 
 export default function FindReaders() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
@@ -314,6 +325,10 @@ export default function FindReaders() {
     }
   };
 
+  const handleViewProfile = (userId: number) => {
+    navigate(`/readers/${userId}`);
+  };
+
   const showSearchState = hasSearchQuery;
 
   const formatMatchNote = (score?: number | null) => {
@@ -391,6 +406,7 @@ export default function FindReaders() {
                     note={formatMatchNote(recommendation.score)}
                     actionLoading={actionUserId === recommendation.to_user.id}
                     onToggleBuddy={handleToggleBuddy}
+                    onViewProfile={handleViewProfile}
                   />
                 ))}
               </div>
@@ -438,6 +454,7 @@ export default function FindReaders() {
                 actionLoading={actionUserId === searchResult.id}
                 note={undefined}
                 onToggleBuddy={handleToggleBuddy}
+                onViewProfile={handleViewProfile}
               />
             </div>
           ) : null}
@@ -466,6 +483,7 @@ export default function FindReaders() {
                   actionLoading={actionUserId === buddy.id}
                   note={undefined}
                   onToggleBuddy={handleToggleBuddy}
+                  onViewProfile={handleViewProfile}
                 />
               ))}
             </div>

@@ -1,0 +1,225 @@
+/* ── Page shell ─────────────────────────────────────────────── */
+.rp-page {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at top left, rgba(248, 244, 235, 0.75), transparent 35%),
+    #efe8dc;
+  color: #2f3726;
+  font-family: var(--font-body);
+}
+
+.rp-shell {
+  width: min(900px, calc(100% - 3rem));
+  margin: 0 auto;
+}
+
+/* ── Hero ───────────────────────────────────────────────────── */
+.rp-hero {
+  background:
+    radial-gradient(circle at top, rgba(255, 248, 236, 0.08), transparent 34%),
+    linear-gradient(180deg, #46543a 0%, #3f4a34 100%);
+  padding-bottom: 3rem;
+}
+
+.rp-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 1.75rem;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #c8c2b8;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.rp-back:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #f3edde;
+}
+
+.rp-hero__body {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.rp-avatar {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: #f3edde;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.03em;
+}
+
+.rp-hero__name {
+  margin: 0;
+  color: #f8f4eb;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 300;
+  line-height: 1.1;
+}
+
+.rp-hero__email {
+  margin: 0.35rem 0 0;
+  color: #a8a29a;
+  font-size: 14px;
+}
+
+/* ── Main content ───────────────────────────────────────────── */
+.rp-main {
+  padding: 2.5rem 0 4rem;
+}
+
+.rp-content {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* ── Cards ──────────────────────────────────────────────────── */
+.rp-card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(70, 84, 58, 0.13);
+  border-radius: 20px;
+  padding: 1.75rem 2rem;
+  box-shadow: 0 4px 24px rgba(63, 74, 52, 0.06);
+}
+
+.rp-card__title {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #2f3726;
+}
+
+/* ── Bio ────────────────────────────────────────────────────── */
+.rp-bio {
+  margin: 0;
+  color: #3f4a34;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* ── Reviews section ────────────────────────────────────────── */
+.rp-reviews__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.rp-reviews__header .rp-card__title {
+  margin-bottom: 0;
+}
+
+.rp-reviews__count {
+  color: #738066;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.rp-reviews {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+/* ── Review card ────────────────────────────────────────────── */
+.rp-review {
+  border: 1px solid rgba(70, 84, 58, 0.11);
+  border-radius: 14px;
+  background: rgba(247, 241, 230, 0.55);
+  padding: 1.1rem 1.25rem;
+}
+
+.rp-review__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.rp-review__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2f3726;
+  line-height: 1.3;
+}
+
+/* ── Stars ──────────────────────────────────────────────────── */
+.rp-stars {
+  display: inline-flex;
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.rp-star {
+  font-size: 1rem;
+  color: #c9bfb0;
+}
+
+.rp-star--filled {
+  color: #b07d30;
+}
+
+/* ── Review body ────────────────────────────────────────────── */
+.rp-review__text {
+  margin: 0 0 0.5rem;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #3f4a34;
+}
+
+.rp-review__text--muted {
+  color: #8a9080;
+  font-style: italic;
+}
+
+.rp-review__date {
+  display: block;
+  font-size: 12px;
+  color: #8a9080;
+  font-family: var(--font-mono);
+}
+
+/* ── State panels ───────────────────────────────────────────── */
+.rp-state {
+  padding: 1.5rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(70, 84, 58, 0.12);
+  color: #5a644d;
+}
+
+.rp-state--error {
+  color: #8f3b22;
+  background: #fff4ef;
+  border-color: rgba(158, 78, 53, 0.22);
+}
+
+.rp-empty {
+  margin: 0;
+  color: #8a9080;
+  font-size: 14px;
+}

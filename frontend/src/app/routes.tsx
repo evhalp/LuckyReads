@@ -11,6 +11,7 @@ import MyShelf from "./pages/MyShelf";
 import Home from "./pages/Home";
 import FindReaders from "./pages/FindReaders";
 import Profile from "./pages/Profile";
+import ViewProfile from "./pages/ReaderProfile";
 import { isAuthenticated } from "./session";
 
 function AuthRedirect() {
@@ -84,6 +85,13 @@ export const routes: RouteObject[] = [
             children: createElement(Profile),
         }),
     },
+    {
+        path: "/readers/:userId",
+        element: createElement(ProtectedRoute, {
+            children: createElement(ViewProfile),
+        }),
+    },
 ];
 
 export const router = createBrowserRouter(routes);
+

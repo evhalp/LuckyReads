@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model, authenticate
 
 from apps.core.abstracts.serializers import ModelSerializer, ModelSerializerBase
 from apps.users.models import User, BuddyRelationship
+from apps.books.models import Review
 
 class UserSerializer(ModelSerializer):
 
@@ -94,3 +95,30 @@ class BuddyRelationshipSerializer(ModelSerializer):
       model = BuddyRelationship
       fields = [*ModelSerializerBase.default_fields, 'buddy']
       read_only_fields = ['buddy']
+
+
+class UserProfileReviewSerializer(ModelSerializer):
+  book_title = serializers.CharField(source="shelf_entry.book.title", read_only=True)
+
+  class Meta:
+    model = Review
+    fields = ["id", "book_title", "rating", "review_text", "created_at"]
+    read_only_fields = fields
+
+
+class PublicUserProfileSerializer(ModelSerializer):
+  name = serializers.CharField(read_only=True)
+  reviews = serializers.SerializerMethodField()
+
+  class Meta:
+    model = User
+    fields = ["id", "name", "email", "bio", "reviews"]
+    read_only_fields = fields
+
+  def get_reviews(self, obj: User) -> list[dict]:
+    queryset = (
+      Review.objects.filter(shelf_entry__user=obj)
+      .select_related("shelf_entry__book")
+      .order_by("-created_at")
+    )
+    return UserProfileReviewSerializer(queryset, many=True).data

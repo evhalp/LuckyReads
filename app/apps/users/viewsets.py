@@ -11,7 +11,7 @@ from apps.core.utils import Query, query_parameters
 from apps.core.abstracts.viewsets import ModelViewSetBase, ViewSetBase
 from apps.users.models import User, BuddyRelationship
 from apps.users.permissions import IsOwnerOrReadOnly
-from apps.users.serializers import LoginSerializer, RegisterSerializer, UserSerializer, PublicUserSerializer, BuddyRelationshipSerializer
+from apps.users.serializers import LoginSerializer, RegisterSerializer, UserSerializer, PublicUserSerializer, BuddyRelationshipSerializer, PublicUserProfileSerializer
 
 @extend_schema(
     request=RegisterSerializer,
@@ -81,6 +81,15 @@ class UserViewSet(mixins.RetrieveModelMixin, ViewSetBase):
         obj = generics.get_object_or_404(User, username=username, is_active=True)
         self.check_object_permissions(request, obj)
         serializer = self.get_serializer(obj)
+        return Response(serializer.data)
+
+    @extend_schema(responses={200: PublicUserProfileSerializer})
+    @action(detail=True, methods=["get"], url_path="profile")
+    def profile(self, request, *args, **kwargs):
+        """Return public profile details and reviews for the specified user."""
+        obj = generics.get_object_or_404(User, id=self.kwargs["pk"], is_active=True)
+        self.check_object_permissions(request, obj)
+        serializer = PublicUserProfileSerializer(obj, context={"request": request})
         return Response(serializer.data)
 
     @action(detail=True, methods=['post'], url_path="buddy")
