@@ -13,18 +13,18 @@ AUTHORS = [
 # Each book entry includes an 'authors' list of openlibrary_keys
 # so we can resolve the Author objects after creating them.
 BOOKS = [
-    {"openlibrary_key": "/works/OL51711484M",    "title": "The Lord of the Rings",                 "cover_url": "https://covers.openlibrary.org/b/olid/OL51711484M-M.jpg",    "authors": ["/authors/OL26320A"]},
-    {"openlibrary_key": "/works/OL51709286M",    "title": "The Hobbit",                            "cover_url": "https://covers.openlibrary.org/b/olid/OL51709286M-M.jpg",    "authors": ["/authors/OL26320A"]},
-    {"openlibrary_key": "/works/OL22581121M",    "title": "The Silmarillion",                      "cover_url": "https://covers.openlibrary.org/b/olid/OL22581121M-M.jpg",    "authors": ["/authors/OL26320A"]},
-    {"openlibrary_key": "/works/OL5613890M",     "title": "A Wizard of Earthsea",                  "cover_url": "https://covers.openlibrary.org/b/olid/OL5613890M-M.jpg", "authors": ["/authors/OL18319A"]},
-    {"openlibrary_key": "/works/OL58688990M",    "title": "The Left Hand of Darkness",             "cover_url": "https://covers.openlibrary.org/b/olid/OL58688990M-M.jpg", "authors": ["/authors/OL18319A"]},
-    {"openlibrary_key": "/works/OL24938050M",    "title": "The Dispossessed",                      "cover_url": "https://covers.openlibrary.org/b/olid/OL24938050M-M.jpg", "authors": ["/authors/OL18319A"]},
-    {"openlibrary_key": "/works/OL26242482M",    "title": "Dune",                                  "cover_url": "https://covers.openlibrary.org/b/olid/OL26242482M-M.jpg",   "authors": ["/authors/OL22098A"]},
-    {"openlibrary_key": "/works/OL18143783M",    "title": "Dune Messiah",                          "cover_url": "https://covers.openlibrary.org/b/olid/OL18143783M-M.jpg",   "authors": ["/authors/OL22098A"]},
-    {"openlibrary_key": "/works/OL51566464M",    "title": "Foundation",                            "cover_url": "https://covers.openlibrary.org/b/olid/OL51566464M-M.jpg",    "authors": ["/authors/OL23919A"]},
-    {"openlibrary_key": "/works/OL10684706M",    "title": "The Caves of Steel",                    "cover_url": "https://covers.openlibrary.org/b/olid/OL10684706M-M.jpg",    "authors": ["/authors/OL23919A"]},
-    {"openlibrary_key": "/works/OL18331969M",    "title": "Do Androids Dream of Electric Sheep?",  "cover_url": "https://covers.openlibrary.org/b/olid/OL18331969M-M.jpg",     "authors": ["/authors/OL24964A"]},
-    {"openlibrary_key": "/works/OL31977870M",    "title": "The Man in the High Castle",            "cover_url": "https://covers.openlibrary.org/b/olid/OL31977870M-M.jpg",     "authors": ["/authors/OL24964A"]},
+    {"openlibrary_key": "/works/OL27448W",    "title": "The Lord of the Rings",                 "cover_url": "https://covers.openlibrary.org/b/id/14625765-M.jpg", "authors": ["/authors/OL26320A"]},
+    {"openlibrary_key": "/works/OL27482W",    "title": "The Hobbit",                            "cover_url": "https://covers.openlibrary.org/b/id/14627509-M.jpg", "authors": ["/authors/OL26320A"]},
+    {"openlibrary_key": "/works/OL27495W",    "title": "The Silmarillion",                      "cover_url": "https://covers.openlibrary.org/b/id/14627042-M.jpg", "authors": ["/authors/OL26320A"]},
+    {"openlibrary_key": "/works/OL59798W",    "title": "A Wizard of Earthsea",                  "cover_url": "https://covers.openlibrary.org/b/id/13617691-M.jpg", "authors": ["/authors/OL18319A"]},
+    {"openlibrary_key": "/works/OL59800W",    "title": "The Left Hand of Darkness",             "cover_url": "https://covers.openlibrary.org/b/id/10618463-M.jpg", "authors": ["/authors/OL18319A"]},
+    {"openlibrary_key": "/works/OL59863W",    "title": "The Dispossessed",                      "cover_url": "https://covers.openlibrary.org/b/id/6979680-M.jpg",  "authors": ["/authors/OL18319A"]},
+    {"openlibrary_key": "/works/OL893415W",   "title": "Dune",                                  "cover_url": "https://covers.openlibrary.org/b/id/11481354-M.jpg", "authors": ["/authors/OL22098A"]},
+    {"openlibrary_key": "/works/OL893526W",   "title": "Dune Messiah",                          "cover_url": "https://covers.openlibrary.org/b/id/2421405-M.jpg",  "authors": ["/authors/OL22098A"]},
+    {"openlibrary_key": "/works/OL46125W",    "title": "Foundation",                            "cover_url": "https://covers.openlibrary.org/b/id/14612610-M.jpg", "authors": ["/authors/OL23919A"]},
+    {"openlibrary_key": "/works/OL46401W",    "title": "The Caves of Steel",                    "cover_url": "https://covers.openlibrary.org/b/id/13790511-M.jpg", "authors": ["/authors/OL23919A"]},
+    {"openlibrary_key": "/works/OL2172356W",  "title": "Do Androids Dream of Electric Sheep?",  "cover_url": "https://covers.openlibrary.org/b/id/207515-M.jpg",   "authors": ["/authors/OL24964A"]},
+    {"openlibrary_key": "/works/OL2172403W",  "title": "The Man in the High Castle",            "cover_url": "https://covers.openlibrary.org/b/id/420452-M.jpg",   "authors": ["/authors/OL24964A"]},
 ]
  
 # Each user entry defines which books they have rated and at what score.
@@ -34,92 +34,92 @@ USERS = [
     {
         "username": "alice",
         "ratings": {
-            "/works/OL51711484M": 5,  # LotR
-            "/works/OL51709286M": 5,  # Hobbit
-            "/works/OL5613890M":  4,  # Earthsea
-            "/works/OL26242482M": 5,  # Dune
+            "/works/OL27448W": 5,  # LotR
+            "/works/OL27482W": 5,  # Hobbit
+            "/works/OL59798W":  4,  # Earthsea
+            "/works/OL893415W": 5,  # Dune
         },
     },
     {
         "username": "bob",
         "ratings": {
-            "/works/OL51711484M": 5,  # LotR
-            "/works/OL51709286M": 4,  # Hobbit
-            "/works/OL22581121M": 5,  # Silmarillion
-            "/works/OL5613890M":  5,  # Earthsea
-            "/works/OL58688990M": 4,  # Left Hand of Darkness
+            "/works/OL27448W": 5,  # LotR
+            "/works/OL27482W": 4,  # Hobbit
+            "/works/OL27495W": 5,  # Silmarillion
+            "/works/OL59798W":  5,  # Earthsea
+            "/works/OL59800W": 4,  # Left Hand of Darkness
         },
     },
     {
         "username": "carol",
         "ratings": {
-            "/works/OL26242482M": 5,  # Dune
-            "/works/OL18143783M": 5,  # Dune Messiah
-            "/works/OL51566464M": 4,  # Foundation
-            "/works/OL51711484M": 4,  # LotR
+            "/works/OL893415W": 5,  # Dune
+            "/works/OL893526W": 5,  # Dune Messiah
+            "/works/OL46125W": 4,  # Foundation
+            "/works/OL27448W": 4,  # LotR
         },
     },
     {
         "username": "dave",
         "ratings": {
-            "/works/OL51566464M": 5,  # Foundation
-            "/works/OL10684706M": 5,  # Caves of Steel
-            "/works/OL18331969M": 4,  # Do Androids Dream
-            "/works/OL26242482M": 4,  # Dune
+            "/works/OL46125W": 5,  # Foundation
+            "/works/OL46401W": 5,  # Caves of Steel
+            "/works/OL2172356W": 4,  # Do Androids Dream
+            "/works/OL893415W": 4,  # Dune
         },
     },
     {
         "username": "eve",
         "ratings": {
-            "/works/OL5613890M":  5,  # Earthsea
-            "/works/OL58688990M": 5,  # Left Hand of Darkness
-            "/works/OL24938050M": 5,  # Dispossessed
-            "/works/OL51711484M": 3,  # LotR (weak signal)
+            "/works/OL59798W":  5,  # Earthsea
+            "/works/OL59800W": 5,  # Left Hand of Darkness
+            "/works/OL59863W": 5,  # Dispossessed
+            "/works/OL27448W": 3,  # LotR (weak signal)
         },
     },
     {
         "username": "frank",
         "ratings": {
-            "/works/OL18331969M": 5,  # Do Androids Dream
-            "/works/OL31977870M": 5,  # Man in the High Castle
-            "/works/OL51566464M": 4,  # Foundation
-            "/works/OL10684706M": 3,  # Caves of Steel (weak signal)
+            "/works/OL2172356W": 5,  # Do Androids Dream
+            "/works/OL2172403W": 5,  # Man in the High Castle
+            "/works/OL46125W": 4,  # Foundation
+            "/works/OL46401W": 3,  # Caves of Steel (weak signal)
         },
     },
     {
         "username": "grace",
         "ratings": {
-            "/works/OL26242482M": 5,  # Dune
-            "/works/OL18143783M": 4,  # Dune Messiah
-            "/works/OL18331969M": 5,  # Do Androids Dream
-            "/works/OL24938050M": 4,  # Dispossessed
+            "/works/OL893415W": 5,  # Dune
+            "/works/OL893526W": 4,  # Dune Messiah
+            "/works/OL2172356W": 5,  # Do Androids Dream
+            "/works/OL59863W": 4,  # Dispossessed
         },
     },
     {
         "username": "henry",
         "ratings": {
-            "/works/OL51711484M": 4,  # LotR
-            "/works/OL51566464M": 5,  # Foundation
-            "/works/OL26242482M": 5,  # Dune
-            "/works/OL31977870M": 4,  # Man in the High Castle
+            "/works/OL27448W": 4,  # LotR
+            "/works/OL46125W": 5,  # Foundation
+            "/works/OL893415W": 5,  # Dune
+            "/works/OL2172403W": 4,  # Man in the High Castle
         },
     },
     {
         "username": "iris",
         "ratings": {
-            "/works/OL58688990M": 5,  # Left Hand of Darkness
-            "/works/OL24938050M": 5,  # Dispossessed
-            "/works/OL18331969M": 4,  # Do Androids Dream
-            "/works/OL10684706M": 4,  # Caves of Steel
+            "/works/OL59800W": 5,  # Left Hand of Darkness
+            "/works/OL59863W": 5,  # Dispossessed
+            "/works/OL2172356W": 4,  # Do Androids Dream
+            "/works/OL46401W": 4,  # Caves of Steel
         },
     },
     {
         "username": "jack",
         "ratings": {
-            "/works/OL22581121M": 5,  # Silmarillion
-            "/works/OL51709286M": 5,  # Hobbit
-            "/works/OL26242482M": 4,  # Dune
-            "/works/OL51566464M": 4,  # Foundation
+            "/works/OL27495W": 5,  # Silmarillion
+            "/works/OL27482W": 5,  # Hobbit
+            "/works/OL893415W": 4,  # Dune
+            "/works/OL46125W": 4,  # Foundation
         },
     },
 ]

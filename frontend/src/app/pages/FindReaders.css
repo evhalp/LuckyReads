@@ -186,24 +186,34 @@
 }
 
 .reader-card__avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #46543a 0%, #6b7d58 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    font-weight: 700;
-    flex-shrink: 0;
-    overflow: hidden;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #46543a 0%, #6d7b60 100%);
+  color: #f8f4eb;
+  font-size: 1.45rem;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
-.reader-card__avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.reader-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+  text-align: left;
+}
+
+.reader-card__eyebrow {
+  margin: 0;
+  color: #738066;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-transform: uppercase;
 }
 
 .reader-card__name {
@@ -231,24 +241,25 @@
   line-height: 1.65;
   display: -webkit-box;
   -webkit-line-clamp: 3;
-  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.reader-card__bio {
-    margin: 0;
-    color: #5a5a5a;
-    font-size: 0.9rem;
-    line-height: 1.5;
-}
-
-.reader-card__genres {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    justify-content: center;
-    width: 100%;
+.reader-card__action {
+  border: none;
+  border-radius: 999px;
+  padding: 0.9rem 1.1rem;
+  background: #46543a;
+  color: #f8f4eb;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
 }
 
 .reader-card__action:hover:not(:disabled) {
@@ -293,25 +304,6 @@
   100% {
     background-position: -200% 0;
   }
-}
-
-.find-readers-profile-preview {
-    margin-top: 2rem;
-    background: #fff;
-    border: 1px solid #e0d9d3;
-    border-radius: 12px;
-    padding: 1.25rem;
-}
-
-.find-readers-profile-preview h3 {
-    margin: 0 0 0.5rem 0;
-    color: #2f3726;
-}
-
-.find-readers-profile-preview p {
-    margin: 0;
-    color: #5a5a5a;
-    line-height: 1.5;
 }
 
 @media (max-width: 768px) {

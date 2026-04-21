@@ -11,14 +11,7 @@ from apps.core.utils import Query, query_parameters
 from apps.core.abstracts.viewsets import ModelViewSetBase, ViewSetBase
 from apps.users.models import User, BuddyRelationship
 from apps.users.permissions import IsOwnerOrReadOnly
-from apps.users.serializers import (
-    LoginSerializer,
-    RegisterSerializer,
-    UserSerializer,
-    PublicUserSerializer,
-    ReaderListUserSerializer,
-    BuddyRelationshipSerializer,
-)
+from apps.users.serializers import LoginSerializer, RegisterSerializer, UserSerializer, PublicUserSerializer, BuddyRelationshipSerializer
 
 @extend_schema(
     request=RegisterSerializer,
@@ -67,7 +60,7 @@ class LoginView(APIView):
             }
         )
     
-class UserViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, ViewSetBase):
+class UserViewSet(mixins.RetrieveModelMixin, ViewSetBase):
     """
     GET /api/users/{id}
     GET /api/users/search/?username={username}
@@ -154,36 +147,6 @@ class UserViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, ViewSetBase)
 
         return Response({"are_buddies": are_buddies})
 
-    @action(detail=True, methods=["get", "delete"], url_path=r"buddies/(?P<buddy_id>[^/.]+)")
-    def legacy_buddy(self, request, buddy_id=None, *args, **kwargs):
-        """Backward-compatible endpoint for legacy clients using /buddies/{buddy_id}."""
-        target_user = generics.get_object_or_404(
-            User, id=self.kwargs['pk'], is_active=True
-        )
-        self.check_object_permissions(request, target_user)
-
-        buddy = generics.get_object_or_404(User, id=buddy_id, is_active=True)
-
-        if request.method == 'GET':
-            are_buddies = BuddyRelationship.objects.filter(
-                user=target_user,
-                buddy=buddy,
-            ).exists()
-            return Response({"are_buddies": are_buddies})
-
-        was_deleted, _ = BuddyRelationship.objects.filter(
-            user=target_user,
-            buddy=buddy,
-        ).delete()
-
-        if not was_deleted:
-            return Response(
-                {'error': 'You are not buddies with this user'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
     @add_buddy.mapping.delete
     def remove_buddy(self, request, *args, **kwargs):
         """Remove the specified user as a buddy"""
@@ -205,8 +168,6 @@ class UserViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, ViewSetBase)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_serializer_class(self) -> type[serializers.ModelSerializer]:
-        if self.action in ('list'):
-            return ReaderListUserSerializer
         if self.action in ('retrieve'):
             obj = self.get_object()
             if obj == self.request.user:

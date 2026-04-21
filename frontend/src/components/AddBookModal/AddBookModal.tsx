@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { getApiErrorMessage } from "../../api/client";
-import { searchOpenLibraryBooks } from "../../services/books";
+import { apiClient } from "../../api/client";
 import "./AddBookModal.css";
 
 type BookStatus = "want_to_read" | "currently_reading" | "read";
@@ -12,15 +11,6 @@ type SearchResult = {
     cover_url?: string;
 };
 
-function toSearchResult(book: Awaited<ReturnType<typeof searchOpenLibraryBooks>>[number]): SearchResult {
-    return {
-        openlibrary_key: book.openLibraryKey || book.id,
-        title: book.title,
-        authors: book.author ? book.author.split(", ").filter(Boolean) : [],
-        cover_url: book.coverUrl,
-    };
-}
-
 type AddBookModalProps = {
     isOpen: boolean;
     onClose: () => void;
@@ -30,9 +20,6 @@ type AddBookModalProps = {
 export default function AddBookModal(props: AddBookModalProps) {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-    const [searching, setSearching] = useState(false);
-    const [submittingKey, setSubmittingKey] = useState<string | null>(null);
-    const [error, setError] = useState("");
     const [selectedStatus, setSelectedStatus] =
         useState<BookStatus>("want_to_read");
 
@@ -44,28 +31,21 @@ export default function AddBookModal(props: AddBookModalProps) {
         if (!searchQuery.trim()) return;
 
         try {
-            setSearching(true);
-            setError("");
-            const results = await searchOpenLibraryBooks(searchQuery);
-            setSearchResults(results.map((result) => toSearchResult(result)));
+            const response = await apiClient.get(
+                `/books/olsearch/?q=${encodeURIComponent(searchQuery)}`,
+            );
+            setSearchResults(response.data);
         } catch (error) {
-            setError(getApiErrorMessage(error));
-        } finally {
-            setSearching(false);
+            console.error("Failed to search books:", error);
         }
     }
-
     async function handleAddClick(book: SearchResult) {
         try {
-            setSubmittingKey(book.openlibrary_key);
-            setError("");
             await props.onAddBook(book, selectedStatus);
             resetModal();
             props.onClose();
         } catch (error) {
-            setError(getApiErrorMessage(error));
-        } finally {
-            setSubmittingKey(null);
+            console.error("Failed to add book:", error);
         }
     }
 
@@ -92,34 +72,14 @@ export default function AddBookModal(props: AddBookModalProps) {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
-                <div className="modal-row">
-                    <label htmlFor="book-status">Add to:</label>
-                    <select
-                        id="book-status"
-                        value={selectedStatus}
-                        onChange={(event) =>
-                            setSelectedStatus(event.target.value as BookStatus)
-                        }
-                    >
-                        <option value="want_to_read">Want to Read</option>
-                        <option value="currently_reading">Currently Reading</option>
-                        <option value="read">Read</option>
-                    </select>
-                </div>
                 <div className="modal-buttons">
-                    <button
-                        className="search-button"
-                        onClick={handleSearch}
-                        disabled={searching}
-                    >
-                        {searching ? "Searching..." : "Search"}
+                    <button className="search-button" onClick={handleSearch}>
+                        Search
                     </button>
                     <button className="close-button" onClick={handleClose}>
                         Close
                     </button>
                 </div>
-
-                {error ? <p className="modal-error">{error}</p> : null}
 
                 <div className="search-results">
                     {searchResults.map((result) => (
@@ -149,12 +109,9 @@ export default function AddBookModal(props: AddBookModalProps) {
                                 </p>
                                 <button
                                     className="add-to-shelf-button"
-                                    disabled={submittingKey === result.openlibrary_key}
                                     onClick={() => handleAddClick(result)}
                                 >
-                                    {submittingKey === result.openlibrary_key
-                                        ? "Adding..."
-                                        : "Add to Shelf"}
+                                    Add to Shelf
                                 </button>
                             </div>
                         </div>

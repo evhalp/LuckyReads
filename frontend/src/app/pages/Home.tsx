@@ -1,18 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import BookCard from "../../components/books/BookCard";
 import BookDetail, { type BookDetailData } from "../../components/BookDetail/BookDetail";
 import {
     fetchRecommendations,
-    fetchAllBooks,
-    fetchOpenLibraryBookDetails,
     searchBooks,
     type DisplayBook,
 } from "../../services/books";
 import "./Home.css";
+
 const SKELETON_COUNT = 6;
-type HomeFilter = "All" | "Books" | "Authors";
-const FILTER_OPTIONS: HomeFilter[] = ["All", "Books", "Authors"];
 
 function SearchIcon() {
     return (
@@ -36,19 +33,15 @@ export default function Home() {
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedQuery, setDebouncedQuery] = useState("");
     const [recommendations, setRecommendations] = useState<DisplayBook[]>([]);
-    const [allBooks, setAllBooks] = useState<DisplayBook[]>([]);
     const [searchResults, setSearchResults] = useState<DisplayBook[]>([]);
     const [loadingRecommendations, setLoadingRecommendations] = useState(true);
-    const [loadingAllBooks, setLoadingAllBooks] = useState(false);
     const [loadingSearch, setLoadingSearch] = useState(false);
     const [error, setError] = useState("");
-    const [activeFilter, setActiveFilter] = useState<HomeFilter>("All");
     const [selectedBook, setSelectedBook] = useState<BookDetailData | null>(null);
     const [isBookDetailOpen, setIsBookDetailOpen] = useState(false);
 
     const trimmedQuery = searchQuery.trim();
     const hasSearchQuery = debouncedQuery.length > 0;
-    const searchSupported = activeFilter !== "Authors";
 
     useEffect(() => {
         let cancelled = false;
@@ -86,47 +79,6 @@ export default function Home() {
     }, []);
 
     useEffect(() => {
-        if (activeFilter !== "Books" || hasSearchQuery) {
-            setLoadingAllBooks(false);
-            setAllBooks([]);
-            return;
-        }
-
-        let cancelled = false;
-
-        async function loadAllBooks() {
-            setLoadingAllBooks(true);
-            setError("");
-
-            try {
-                const data = await fetchAllBooks();
-                if (!cancelled) {
-                    setAllBooks(data);
-                }
-            } catch (requestError) {
-                if (!cancelled) {
-                    setAllBooks([]);
-                    setError(
-                        requestError instanceof Error
-                            ? requestError.message
-                            : "Could not load books right now.",
-                    );
-                }
-            } finally {
-                if (!cancelled) {
-                    setLoadingAllBooks(false);
-                }
-            }
-        }
-
-        loadAllBooks();
-
-        return () => {
-            cancelled = true;
-        };
-    }, [activeFilter, hasSearchQuery]);
-
-    useEffect(() => {
         const timeoutId = window.setTimeout(() => {
             setDebouncedQuery(trimmedQuery);
         }, 350);
@@ -137,7 +89,7 @@ export default function Home() {
     }, [trimmedQuery]);
 
     useEffect(() => {
-        if (!debouncedQuery || !searchSupported) {
+        if (!debouncedQuery) {
             setLoadingSearch(false);
             setSearchResults([]);
             setError("");
@@ -176,82 +128,22 @@ export default function Home() {
         return () => {
             cancelled = true;
         };
-    }, [debouncedQuery, searchSupported]);
+    }, [debouncedQuery]);
 
-    const heading = hasSearchQuery
-        ? activeFilter === "Authors"
-            ? "Author Search"
-            : "Search Results"
-        : activeFilter === "Books"
-        ? "All Books"
-        : activeFilter === "Authors"
-        ? "Featured Authors"
-        : "Recommended For You";
-    const cards = hasSearchQuery
-        ? searchSupported
-            ? searchResults
-            : []
-        : activeFilter === "Books"
-        ? allBooks
-        : activeFilter === "Authors"
-        ? []
-        : recommendations;
-    const isLoading = hasSearchQuery
-        ? searchSupported
-            ? loadingSearch
-            : false
-        : activeFilter === "Books"
-        ? loadingAllBooks
-        : activeFilter === "Authors"
-        ? false
-        : loadingRecommendations;
+    const heading = hasSearchQuery ? "Search Results" : "Recommended For You";
+    const cards = hasSearchQuery ? searchResults : recommendations;
+    const isLoading = hasSearchQuery ? loadingSearch : loadingRecommendations;
     const showInlineWarning = Boolean(error) && cards.length > 0;
 
-    const helperMessage = useMemo(() => {
-        if (!hasSearchQuery || searchSupported) {
-            return "";
-        }
-
-        return `${activeFilter} search is not connected yet. Try All or Books for now.`;
-    }, [activeFilter, hasSearchQuery, searchSupported]);
-
-    const handleBookClick = async (book: DisplayBook) => {
+    const handleBookClick = (book: DisplayBook) => {
         setSelectedBook({
             id: book.id,
             title: book.title,
             author: book.author,
             coverUrl: book.coverUrl,
-            rating: book.averageRating,
             matchPercentage: book.matchPercentage,
-            isbn: book.isbn,
-            reviews: book.reviews,
         });
         setIsBookDetailOpen(true);
-
-        try {
-            const details = await fetchOpenLibraryBookDetails({
-                title: book.title,
-                openLibraryKey: book.openLibraryKey,
-                isbn: book.isbn,
-            });
-
-            setSelectedBook((current) => {
-                if (!current || current.id !== book.id) {
-                    return current;
-                }
-
-                return {
-                    ...current,
-                    pages: details.pages,
-                    published: details.published,
-                    genres: details.genres,
-                    about: details.about,
-                    isbn: details.isbn || current.isbn,
-                };
-            });
-        } catch {
-            // Keep the modal open with available local data if enrichment fails.
-        }
     };
 
     return (
@@ -276,25 +168,6 @@ export default function Home() {
                                 placeholder="Search for books or authors..."
                             />
                         </label>
-
-                        <div className="home-filters" role="tablist" aria-label="Browse filters">
-                            {FILTER_OPTIONS.map((filter) => (
-                                <button
-                                    key={filter}
-                                    type="button"
-                                    role="tab"
-                                    aria-selected={activeFilter === filter}
-                                    className={
-                                        activeFilter === filter
-                                            ? "home-filter home-filter--active"
-                                            : "home-filter"
-                                    }
-                                    onClick={() => setActiveFilter(filter)}
-                                >
-                                    {filter}
-                                </button>
-                            ))}
-                        </div>
                     </div>
                 </div>
             </section>
@@ -309,10 +182,6 @@ export default function Home() {
                                 <p className="home-results__subtitle">
                                     Showing results for "{debouncedQuery}"
                                 </p>
-                            ) : null}
-
-                            {helperMessage ? (
-                                <p className="home-results__meta">{helperMessage}</p>
                             ) : null}
                         </div>
 
@@ -349,7 +218,7 @@ export default function Home() {
                                     <BookCard
                                         key={book.id}
                                         book={book}
-                                        onClick={() => void handleBookClick(book)}
+                                        onClick={() => handleBookClick(book)}
                                     />
                                 ))}
                             </div>

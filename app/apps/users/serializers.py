@@ -2,7 +2,6 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 
 from apps.core.abstracts.serializers import ModelSerializer, ModelSerializerBase
-from apps.books.models import Review
 from apps.users.models import User, BuddyRelationship
 
 class UserSerializer(ModelSerializer):
@@ -45,56 +44,15 @@ class UserSerializer(ModelSerializer):
      return super().update(instance, validated_data)
   
 class PublicUserSerializer(ModelSerializer):
-  name = serializers.CharField(source='username', read_only=True)
-  email = serializers.EmailField(read_only=True)
-  reviews = serializers.SerializerMethodField()
-
-  def get_reviews(self, obj: User) -> list[dict]:
-    reviews = Review.objects.filter(
-        shelf_entry__user=obj,
-    ).select_related('shelf_entry__book').prefetch_related('shelf_entry__book__authors').order_by('-created_at')
-
-    return [
-      {
-        'id': review.id,
-        'book_title': review.shelf_entry.book.title,
-        'book_openlibrary_key': review.shelf_entry.book.openlibrary_key,
-        'book_isbn': review.shelf_entry.book.isbn,
-        'book_cover_url': review.shelf_entry.book.cover_url,
-        'book_authors': [author.name for author in review.shelf_entry.book.authors.all()],
-        'book_average_rating': review.shelf_entry.book.average_rating,
-        'rating': review.rating,
-        'review_text': review.review_text,
-        'created_at': review.created_at,
-      }
-      for review in reviews
-    ]
   
   class Meta:
     model = User
     fields = [
         *ModelSerializerBase.default_fields,
-        'name',
         "username",
-        'email',
         "bio",
-        'reviews',
     ]
-    read_only_fields = ['id', 'name', 'username', 'email', 'bio', 'reviews']
-
-class ReaderListUserSerializer(ModelSerializer):
-  name = serializers.CharField(source='username', read_only=True)
-
-  class Meta:
-    model = User
-    fields = [
-        *ModelSerializerBase.default_fields,
-        'name',
-        'username',
-        'bio',
-        'avatar_url',
-    ]
-    read_only_fields = ['id', 'name', 'username', 'bio', 'avatar_url']
+    read_only_fields = ['id', 'username', 'bio']
 
 class RegisterSerializer(serializers.ModelSerializer):
 

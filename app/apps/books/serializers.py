@@ -11,35 +11,10 @@ class AuthorSerializer(ModelSerializer):
 
 class BookSerializer(ModelSerializer):
     authors = AuthorSerializer(many=True, read_only=True)
-    reviews = serializers.SerializerMethodField()
-
-    def get_reviews(self, obj: Book) -> list[dict]:
-        queryset = Review.objects.filter(
-            shelf_entry__book=obj,
-        ).select_related('shelf_entry__user').order_by('-created_at')[:10]
-
-        return [
-            {
-                'id': review.id,
-                'author': review.shelf_entry.user.username,
-                'rating': review.rating,
-                'text': review.review_text,
-            }
-            for review in queryset
-        ]
 
     class Meta:
         model = Book
-        fields = [
-            'id',
-            'openlibrary_key',
-            'title',
-            'authors',
-            'cover_url',
-            'isbn',
-            "average_rating",
-            'reviews',
-        ]
+        fields = ['id', 'openlibrary_key', 'title', 'authors', 'cover_url', 'isbn', "average_rating"]
 
 
 class ReviewSerializer(ModelSerializer):

@@ -1,17 +1,16 @@
-﻿import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import {
-  fetchCurrentUser,
-  fetchBuddies,
-  fetchBuddyRecommendations,
-  searchUserByUsername,
-  checkBuddyStatus,
   addBuddy,
+  fetchBuddyRecommendations,
+  checkBuddyStatus,
+  fetchBuddies,
+  fetchCurrentUser,
   removeBuddy,
-  type PublicUser,
-  type BuddyRelationship,
+  searchUserByUsername,
   type BuddyRecommendation,
+  type BuddyRelationship,
+  type PublicUser,
 } from "../../api/users";
 import { getApiErrorMessage, isAxiosApiError } from "../../api/client";
 import "./FindReaders.css";
@@ -34,46 +33,50 @@ function SearchIcon() {
   );
 }
 
-interface ReaderCardProps {
-  user: PublicUser;
-  status: "self" | "buddy" | "not_buddy";
-  note?: string;
-  actionLoading: boolean;
-  onToggleBuddy: (user: PublicUser, isBuddy: boolean) => void;
+function getDisplayName(user: PublicUser) {
+  return user.username?.trim() || "Reader";
 }
 
-function ReaderCard({ user, status, note, actionLoading, onToggleBuddy }: ReaderCardProps) {
-  const navigate = useNavigate();
+function getInitials(user: PublicUser) {
+  const source = getDisplayName(user);
+  const parts = source.split(/\s+/).filter(Boolean);
+  const initials = parts
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
 
+  return initials || "LR";
+}
+
+function ReaderCard({
+  user,
+  status,
+  actionLoading,
+  note,
+  onToggleBuddy,
+}: {
+  user: PublicUser;
+  status: "self" | "buddy" | "not_buddy";
+  actionLoading: boolean;
+  note?: string;
+  onToggleBuddy: (user: PublicUser, isBuddy: boolean) => void;
+}) {
+  const displayName = getDisplayName(user);
   const buttonLabel =
-    status === "self"
-      ? "That's you!"
-      : status === "buddy"
-      ? "Remove Buddy"
-      : "Add Buddy";
-
+    status === "self" ? "This is you" : status === "buddy" ? "Remove buddy" : "Add buddy";
   const disabled = status === "self" || actionLoading;
 
   return (
     <article className="reader-card">
-      <div className="reader-card__info">
-        <div className="reader-card__avatar">
-          {user.avatar_url ? (
-            <img src={user.avatar_url} alt={`${user.username}'s avatar`} />
-          ) : (
-            user.username.charAt(0).toUpperCase()
-          )}
-        </div>
-        <div className="reader-card__details">
-          <button
-            type="button"
-            className="reader-card__name"
-            onClick={() => navigate(`/readers/${user.id}`)}
-          >
-            {user.username}
-          </button>
+      <div className="reader-card__content">
+        <div className="reader-card__avatar">{getInitials(user)}</div>
+        <div className="reader-card__body">
+          <p className="reader-card__eyebrow">@{user.username}</p>
+          <h3 className="reader-card__name">{displayName}</h3>
           {note ? <p className="reader-card__note">{note}</p> : null}
-          {user.bio ? <p className="reader-card__bio">{user.bio}</p> : null}
+          <p className="reader-card__bio">
+            {user.bio?.trim() || "This reader has not added a bio yet."}
+          </p>
         </div>
       </div>
       <button
@@ -134,26 +137,15 @@ export default function FindReaders() {
 
       try {
         const user = await fetchCurrentUser();
-        const [buddiesResult, recommendationsResult] = await Promise.allSettled([
+        const [buddyRelationships, buddyRecommendations] = await Promise.all([
           fetchBuddies(user.id),
           fetchBuddyRecommendations(),
         ]);
 
         if (!cancelled) {
           setCurrentUserId(user.id);
-
-          if (buddiesResult.status === "fulfilled") {
-            setBuddies(buddiesResult.value);
-          } else {
-            setBuddies([]);
-            setError(getApiErrorMessage(buddiesResult.reason));
-          }
-
-          if (recommendationsResult.status === "fulfilled") {
-            setRecommendations(recommendationsResult.value);
-          } else {
-            setRecommendations([]);
-          }
+          setBuddies(buddyRelationships);
+          setRecommendations(buddyRecommendations);
         }
       } catch (requestError) {
         if (!cancelled) {
